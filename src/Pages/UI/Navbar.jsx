@@ -1,66 +1,124 @@
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router";
-import { Bell, LayoutDashboard, LogOut } from "lucide-react";
+import { FaBell, FaChevronDown, FaUserCircle } from "react-icons/fa";
+import useAuth from "../../Hooks/useAuth";
+import logo from "../../assets/logo.png";
 
 const Navbar = () => {
+    const { user, logOutUser } = useAuth();
+    console.log(user);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef();
 
-    // Toggle this to simulate login state
-    const isLoggedIn = true;
+    // Close dropdown when clicked outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
-    const fakeUser = {
-        name: "Mahmudul Alam",
-        photoURL: "/default-avatar.png", // use actual user image path or default
+    // Handle logout
+    const handleLogout = async () => {
+        try {
+            await logOutUser();
+            setDropdownOpen(false);
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
     };
 
     return (
-        <nav className="bg-white shadow px-6 py-3 flex justify-between items-center">
+        <nav className="bg-white shadow-md p-4 px-6 flex items-center justify-between">
             {/* Left: Logo + Name */}
-            <Link to="/" className="flex items-center space-x-2">
-                <img src="../../assets/logo.png" alt="Logo" className="w-8 h-8" />
+            <div className="flex items-center space-x-2">
+                <img src={logo} alt="Logo" className="h-8 w-8" />
                 <span className="text-xl font-bold text-gray-800">ThreadHub</span>
-            </Link>
+            </div>
 
-            {/* Right: Links */}
-            <div className="flex items-center space-x-4">
-                <Link to="/" className="text-gray-600 hover:text-blue-600">
+            {/* Right: Nav Links + User / Join Us */}
+            <div className="flex items-center space-x-6 relative">
+                <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium">
                     Home
                 </Link>
-                <Link to="/membership" className="text-gray-600 hover:text-blue-600">
+                <Link to="/membership" className="text-gray-700 hover:text-blue-600 font-medium">
                     Membership
                 </Link>
-                <Bell className="w-5 h-5 text-gray-600 hover:text-blue-600 cursor-pointer" />
+                <button className="text-gray-700 hover:text-blue-600 relative">
+                    <FaBell size={20} />
+                    <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
+                        3
+                    </span>
+                </button>
 
-                {!isLoggedIn ? (
-                    <Link
-                        to="/login"
-                        className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
-                    >
-                        Join Us
-                    </Link>
-                ) : (
-                    <div className="relative">
-                        <img
+                {!user ? (
+                    // If no user, show Join Us dropdown
+                    <div className="relative" ref={dropdownRef}>
+                        <button
                             onClick={() => setDropdownOpen(!dropdownOpen)}
-                            src={fakeUser.photoURL}
-                            alt="Profile"
-                            className="w-9 h-9 rounded-full border cursor-pointer"
-                        />
+                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2 transition"
+                        >
+                            Join Us <FaChevronDown className="text-sm" />
+                        </button>
+
                         {dropdownOpen && (
-                            <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-md z-20">
-                                <div className="px-4 py-2 text-gray-800 font-semibold">
-                                    {fakeUser.name}
+                            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                                <Link
+                                    to="/login"
+                                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                    onClick={() => setDropdownOpen(false)}
+                                >
+                                    Login
+                                </Link>
+                                <Link
+                                    to="/signup"
+                                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                    onClick={() => setDropdownOpen(false)}
+                                >
+                                    Sign Up
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    // If user is logged in, show profile picture and dropdown
+                    <div className="relative" ref={dropdownRef}>
+                        <button
+                            onClick={() => setDropdownOpen(!dropdownOpen)}
+                            className="flex items-center gap-2 focus:outline-none"
+                        >
+                            {user.photoURL ? (
+                                <img
+                                    src={user.photoURL}
+                                    alt={user.displayName || "User"}
+                                    className="h-8 w-8 rounded-full object-cover border border-gray-300"
+                                />
+                            ) : (
+                                <FaUserCircle className="h-8 w-8 text-gray-400" />
+                            )}
+                            <FaChevronDown className="text-sm text-gray-600" />
+                        </button>
+
+                        {dropdownOpen && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 py-2">
+                                <div className="px-4 py-2 border-b border-gray-200 text-gray-700 font-semibold select-none">
+                                    {user.displayName || "User"}
                                 </div>
                                 <Link
                                     to="/dashboard"
-                                    className="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700"
+                                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                    onClick={() => setDropdownOpen(false)}
                                 >
-                                    <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
+                                    Dashboard
                                 </Link>
                                 <button
-                                    className="flex items-center w-full px-4 py-2 hover:bg-gray-100 text-gray-700"
+                                    onClick={handleLogout}
+                                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
                                 >
-                                    <LogOut className="w-4 h-4 mr-2" /> Logout
+                                    Logout
                                 </button>
                             </div>
                         )}
