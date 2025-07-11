@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { NavLink, Link } from "react-router";
-import { FaBell, FaChevronDown, FaUserCircle } from "react-icons/fa";
+import { FaBell, FaBars, FaChevronDown, FaTimes, FaUserCircle } from "react-icons/fa";
 import useAuth from "../../Hooks/useAuth";
 import logo from "../../assets/logo.png";
 
 const Navbar = () => {
     const { user, logOutUser } = useAuth();
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const dropdownRef = useRef();
 
     // Close dropdown on outside click
@@ -24,6 +25,7 @@ const Navbar = () => {
         try {
             await logOutUser();
             setDropdownOpen(false);
+            setMobileMenuOpen(false);
         } catch (err) {
             console.error("Logout error:", err);
         }
@@ -39,8 +41,8 @@ const Navbar = () => {
                 </div>
             </Link>
 
-            {/* Navigation + User Controls */}
-            <div className="flex items-center gap-6 relative">
+            {/* Desktop Navigation + User Controls */}
+            <div className="hidden lg:flex items-center gap-6 relative">
                 <NavLink
                     to="/"
                     className={({ isActive }) =>
@@ -138,6 +140,88 @@ const Navbar = () => {
                     </div>
                 )}
             </div>
+
+            {/* Mobile Menu Button */}
+            <button
+                className="lg:hidden text-gray-700 focus:outline-none"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+            >
+                {mobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            </button>
+
+            {/* Mobile Menu */}
+            {mobileMenuOpen && (
+                <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-b-md py-4 flex flex-col z-50 animate-dropdownFade lg:hidden">
+                    {/* Notifications item */}
+                    <button
+                        className="flex items-center gap-2 px-6 py-3 text-gray-700 hover:bg-gray-100 transition font-medium"
+                        onClick={() => {
+                            // You can handle notification click here
+                            setMobileMenuOpen(false);
+                        }}
+                    >
+                        <FaBell size={20} />
+                        <span>Notifications</span>
+                        <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2">
+                            3
+                        </span>
+                    </button>
+
+                    <NavLink
+                        to="/"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="px-6 py-3 text-gray-700 hover:bg-gray-100 transition font-medium"
+                    >
+                        Home
+                    </NavLink>
+                    <NavLink
+                        to="/membership"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="px-6 py-3 text-gray-700 hover:bg-gray-100 transition font-medium"
+                    >
+                        Membership
+                    </NavLink>
+
+                    {!user ? (
+                        <>
+                            <NavLink
+                                to="/login"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="px-6 py-3 text-gray-700 hover:bg-gray-100 transition font-medium"
+                            >
+                                Login
+                            </NavLink>
+                            <NavLink
+                                to="/signup"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="px-6 py-3 text-gray-700 hover:bg-gray-100 transition font-medium"
+                            >
+                                Sign Up
+                            </NavLink>
+                        </>
+                    ) : (
+                        <>
+                            <div className="px-6 py-3 text-gray-700 font-semibold border-b border-gray-200">
+                                {user.displayName || "User"}
+                            </div>
+                            <NavLink
+                                to="/dashboard"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="px-6 py-3 text-gray-700 hover:bg-gray-100 transition font-medium"
+                            >
+                                Dashboard
+                            </NavLink>
+                            <button
+                                onClick={handleLogout}
+                                className="text-left px-6 py-3 text-red-600 hover:bg-red-50 transition font-medium"
+                            >
+                                Logout
+                            </button>
+                        </>
+                    )}
+                </div>
+            )}
         </nav>
     );
 };
