@@ -2,61 +2,67 @@ import React from "react";
 import { Link } from "react-router";
 import { FaFacebookF, FaTwitter, FaLinkedinIn, FaGithub } from "react-icons/fa";
 import logo from "../../assets/logo.png";
+import useAuth from "../../Hooks/useAuth";
 
 const Footer = () => {
-    return (
-        <footer className="bg-gray-900 text-gray-300 py-10 px-6 sm:px-12">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
+    const { darkMode } = useAuth();
 
-                {/* Logo & Description */}
-                <div className="flex flex-col items-start space-y-3 md:w-1/3">
-                    <Link to="/" className="flex items-center gap-2">
-                        <img src={logo} alt="ThreadHub Logo" className="h-10 w-10" />
-                        <span className="text-2xl font-bold text-white">ThreadHub</span>
+    return (
+        <footer className={`${darkMode ? 'bg-gray-900 text-gray-300 border-gray-700' : 'bg-white text-gray-700 border-gray-200'} border-t py-10 px-6 sm:px-12 transition-colors duration-300`}>
+            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
+
+                {/* Logo & About */}
+                <div>
+                    <Link to="/" className="flex items-center gap-2 mb-4">
+                        <img src={logo} alt="Logo" className="h-10 w-10" />
+                        <span className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>ThreadHub</span>
                     </Link>
-                    <p className="text-gray-400 mt-2 leading-relaxed">
-                        ThreadHub is your go-to forum for meaningful conversations, sharing knowledge, and connecting with community members.
+                    <p className={`text-sm leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        A modern forum to share ideas, explore knowledge, and engage with a vibrant tech community.
                     </p>
                 </div>
 
-                {/* Quick Links */}
-                <div className="flex flex-col space-y-4 md:w-1/4">
-                    <h3 className="text-white font-semibold text-lg mb-2">Quick Links</h3>
-                    <nav className="flex flex-col space-y-1">
-                        <Link to="/" className="hover:text-white transition">Home</Link>
-                        <Link to="/membership" className="hover:text-white transition">Membership</Link>
-                        <Link to="/login" className="hover:text-white transition">Join Us</Link>
-                    </nav>
+                {/* Links */}
+                <div>
+                    <h4 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Quick Links</h4>
+                    <ul className="space-y-2 text-sm">
+                        <li><Link to="/" className={`hover:text-sky-600 transition ${darkMode ? 'text-gray-400 hover:text-sky-400' : 'text-gray-600'}`}>Home</Link></li>
+                        <li><Link to="/membership" className={`hover:text-orange-500 transition ${darkMode ? 'text-gray-400 hover:text-orange-400' : 'text-gray-600'}`}>Membership</Link></li>
+                        <li><Link to="/login" className={`hover:text-green-600 transition ${darkMode ? 'text-gray-400 hover:text-green-400' : 'text-gray-600'}`}>Join Us</Link></li>
+                    </ul>
                 </div>
 
-                {/* Social Media & Contact */}
-                <div className="flex flex-col space-y-4 md:w-1/3">
-                    <h3 className="text-white font-semibold text-lg mb-2">Connect with Us</h3>
-                    <div className="flex space-x-4 text-gray-400">
-                        <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" className="hover:text-white transition">
+                {/* Socials */}
+                <div>
+                    <h4 className={`text-lg font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Connect With Us</h4>
+                    <div className={`flex gap-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <a href="https://facebook.com" target="_blank" rel="noreferrer" className={`${darkMode ? 'hover:text-blue-400' : 'hover:text-blue-600'}`}>
                             <FaFacebookF size={20} />
                         </a>
-                        <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter" className="hover:text-white transition">
+                        <a href="https://twitter.com" target="_blank" rel="noreferrer" className={`${darkMode ? 'hover:text-sky-300' : 'hover:text-sky-500'}`}>
                             <FaTwitter size={20} />
                         </a>
-                        <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="hover:text-white transition">
+                        <a href="https://linkedin.com" target="_blank" rel="noreferrer" className={`${darkMode ? 'hover:text-blue-400' : 'hover:text-blue-700'}`}>
                             <FaLinkedinIn size={20} />
                         </a>
-                        <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub" className="hover:text-white transition">
+                        <a href="https://github.com" target="_blank" rel="noreferrer" className={`${darkMode ? 'hover:text-white' : 'hover:text-gray-800'}`}>
                             <FaGithub size={20} />
                         </a>
                     </div>
 
-                    <div className="text-gray-400 mt-2">
+                    <div className={`mt-4 text-sm space-y-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                         <p>Email: support@threadhub.com</p>
                         <p>Phone: +1 (234) 567-8901</p>
                     </div>
                 </div>
             </div>
 
+            {/* Horizontal line */}
+            <hr className={`mt-10 ${darkMode ? 'border-gray-700' : 'border-gray-300'}`} />
+
             {/* Copyright */}
-            <div className="mt-10 border-t border-gray-700 pt-6 text-center text-gray-500 text-sm">
-                &copy; {new Date().getFullYear()} ThreadHub. All rights reserved.
+            <div className={`mt-6 text-center text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                &copy; {new Date().getFullYear()} ThreadHub. Built with 💙
             </div>
         </footer>
     );
