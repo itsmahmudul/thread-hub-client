@@ -1,132 +1,186 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router";
+import axios from "axios";
 import useAuth from "../Hooks/useAuth";
 import SocialLogin from "./SocialLogin";
 
 const SignUp = () => {
-    const { cerateUser } = useAuth();
+    const { createUser, updateUserProfile, darkMode } = useAuth();
     const navigate = useNavigate();
 
-    const [formData, setFormData] = useState({
-        name: "",
-        photo: "",
-        email: "",
-        password: ""
-    });
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors }
+    } = useForm();
 
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
+    const [profilePic, setProfilePic] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState("");
 
-    const handleChange = (e) => {
-        setFormData(prev => ({
-            ...prev,
-            [e.target.name]: e.target.value
-        }));
-    };
+    const handleImageUpload = async (e) => {
+        const image = e.target.files[0];
+        if (!image) return;
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const { email, password } = formData;
+        const formData = new FormData();
+        formData.append("image", image);
 
         try {
-            setError("");
-            setSuccess("");
-            await cerateUser(email, password);
+            setUploading(true);
+            setUploadError("");
 
-            setSuccess("Signup successful!");
-            navigate("/"); // redirect to home or dashboard
+            const imagUploadUrl = `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMAGE_UPLOAD_KEY}`;
+            const res = await axios.post(imagUploadUrl, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+
+            const imgURL = res.data.data.url;
+            setProfilePic(imgURL);
         } catch (err) {
             console.error(err);
-            setError(err.message);
+            setUploadError("Image upload failed.");
+        } finally {
+            setUploading(false);
         }
     };
 
+    const onSubmit = async (data) => {
+        const { name, email, password } = data;
+
+        try {
+            if (!profilePic) {
+                setUploadError("Please upload a profile picture.");
+                return;
+            }
+
+            await createUser(email, password);
+            await updateUserProfile(name, profilePic);
+
+            reset();
+            navigate("/");
+        } catch (error) {
+            console.error("Signup failed:", error);
+        }
+    };
+
+    // Helper to conditionally apply dark mode classes
+    const inputClasses = `w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${darkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-white border-gray-300 text-gray-900 placeholder-gray-600"
+        }`;
+
+    const labelClasses = `block mb-2 text-sm font-semibold ${darkMode ? "text-gray-300" : "text-gray-700"
+        }`;
+
+    const errorClasses = "text-sm text-red-500 mt-1";
+
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12 sm:py-20">
-            <div className="flex flex-col sm:flex-row bg-white rounded-3xl shadow-xl max-w-5xl w-full overflow-hidden animate-fadeIn">
-
-                {/* Left: Signup Form */}
+        <div
+            className={`min-h-screen flex items-center justify-center px-4 py-12 sm:py-20 ${darkMode
+                    ? "bg-gray-900 bg-gradient-to-br from-gray-800 to-gray-900"
+                    : "bg-gradient-to-br from-blue-50 to-indigo-100"
+                }`}
+        >
+            <div
+                className={`flex flex-col sm:flex-row rounded-3xl max-w-5xl w-full overflow-hidden animate-fadeInUp duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.1)] ${darkMode ? "bg-gray-800 shadow-lg shadow-black/40" : "bg-white"
+                    }`}
+            >
+                {/* Form Section */}
                 <form
-                    onSubmit={handleSubmit}
-                    className="w-full sm:w-1/2 p-10 sm:p-16"
+                    onSubmit={handleSubmit(onSubmit)}
+                    className={`w-full sm:w-1/2 p-10 sm:p-16 animate-fadeInLeft ${darkMode ? "bg-gray-800" : "bg-white"
+                        }`}
                 >
-                    <h2 className="text-3xl font-extrabold mb-8 text-gray-900 text-center">Create Account</h2>
-
-                    {error && (
-                        <p className="mb-6 text-center text-red-600 font-medium animate-fadeInDown">
-                            {error}
-                        </p>
-                    )}
-                    {success && (
-                        <p className="mb-6 text-center text-green-600 font-medium animate-fadeInDown">
-                            {success}
-                        </p>
-                    )}
+                    <h2
+                        className={`text-3xl font-extrabold mb-8 text-center ${darkMode ? "text-gray-100" : "text-gray-800"
+                            }`}
+                    >
+                        Create Your Account
+                    </h2>
 
                     <div className="space-y-6">
                         <div>
-                            <label className="block mb-2 font-semibold text-gray-700">Full Name</label>
+                            <label className={labelClasses}>Full Name</label>
                             <input
-                                type="text"
-                                name="name"
-                                placeholder="Enter your full name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition"
+                                {...register("name", { required: "Name is required" })}
+                                placeholder="Enter Your Name"
+                                className={inputClasses}
                             />
+                            {errors.name && <p className={errorClasses}>{errors.name.message}</p>}
                         </div>
 
                         <div>
-                            <label className="block mb-2 font-semibold text-gray-700">Photo URL (optional)</label>
-                            <input
-                                type="text"
-                                name="photo"
-                                placeholder="Enter photo URL"
-                                value={formData.photo}
-                                onChange={handleChange}
-                                className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block mb-2 font-semibold text-gray-700">Email</label>
+                            <label className={labelClasses}>Email</label>
                             <input
                                 type="email"
-                                name="email"
-                                placeholder="Enter your email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition"
+                                {...register("email", { required: "Email is required" })}
+                                placeholder="Enter Your Email"
+                                className={inputClasses}
                             />
+                            {errors.email && <p className={errorClasses}>{errors.email.message}</p>}
                         </div>
 
                         <div>
-                            <label className="block mb-2 font-semibold text-gray-700">Password</label>
+                            <label className={labelClasses}>Password</label>
                             <input
                                 type="password"
-                                name="password"
-                                placeholder="Enter your password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition"
+                                {...register("password", {
+                                    required: "Password is required",
+                                    minLength: { value: 6, message: "Minimum 6 characters" }
+                                })}
+                                placeholder="Enter Your Password"
+                                className={inputClasses}
                             />
+                            {errors.password && <p className={errorClasses}>{errors.password.message}</p>}
+                        </div>
+
+                        <div>
+                            <label className={labelClasses}>Profile Picture</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className={`w-full cursor-pointer text-sm border rounded-lg px-4 py-2 ${darkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300"
+                                    }`}
+                            />
+                            {uploading && (
+                                <p className="text-blue-500 mt-1 text-sm">Uploading...</p>
+                            )}
+                            {uploadError && (
+                                <p className="text-red-500 mt-1 text-sm">{uploadError}</p>
+                            )}
+                            {profilePic && (
+                                <div className="mt-3">
+                                    <img
+                                        src={profilePic}
+                                        alt="Preview"
+                                        className="h-16 w-16 rounded-full object-cover border-2 border-blue-500 shadow-lg transition-transform duration-300 hover:scale-105"
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <button
                             type="submit"
-                            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 shadow-md transition"
+                            className={`w-full py-3 rounded-lg font-semibold shadow-md hover:scale-[1.02] transition-all duration-300 ${darkMode
+                                    ? "bg-blue-700 text-white hover:bg-blue-800"
+                                    : "bg-blue-600 text-white hover:bg-blue-700"
+                                }`}
                         >
                             Sign Up
                         </button>
 
-                        <p className="mt-6 text-center text-gray-600">
+                        <p
+                            className={`text-sm text-center mt-4 ${darkMode ? "text-gray-300" : "text-gray-600"
+                                }`}
+                        >
                             Already have an account?{" "}
                             <Link
                                 to="/login"
-                                className="text-blue-600 font-semibold hover:text-blue-700 focus:outline-none focus:underline transition"
+                                className={`font-medium hover:underline ${darkMode ? "text-blue-400" : "text-blue-600"
+                                    }`}
                             >
                                 Login
                             </Link>
@@ -134,10 +188,18 @@ const SignUp = () => {
                     </div>
                 </form>
 
-                {/* Right: Social Login */}
-                <div className="w-full sm:w-1/2 bg-gradient-to-tr from-blue-600 to-indigo-600 flex flex-col justify-center p-10 sm:p-16 text-white rounded-tr-3xl rounded-br-3xl">
-                    <h3 className="text-2xl font-bold mb-6 text-center">Or sign up with</h3>
+                {/* Right Side */}
+                <div
+                    className={`w-full sm:w-1/2 p-10 sm:p-16 flex flex-col justify-center items-center animate-fadeInRight ${darkMode
+                            ? "bg-gradient-to-tr from-gray-900 to-gray-800 text-white"
+                            : "bg-gradient-to-tr from-blue-600 to-indigo-700 text-white"
+                        }`}
+                >
+                    <h3 className="text-2xl font-bold mb-4">Or sign up with</h3>
                     <SocialLogin />
+                    <div className="mt-10 text-center text-sm opacity-70">
+                        Empower your learning journey with us.
+                    </div>
                 </div>
             </div>
         </div>
