@@ -1,10 +1,11 @@
 import React from 'react';
+import BannerSearch from './Banner';
 
 const Home = () => {
     return (
-        <div>
-            this is home.....
-        </div>
+        <section>
+            <BannerSearch></BannerSearch>
+        </section>
     );
 };
 
