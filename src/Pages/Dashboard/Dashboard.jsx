@@ -15,12 +15,10 @@ const Dashboard = () => {
         <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
             {/* Sidebar */}
             <aside className={`w-64 ${darkMode ? 'bg-gray-800' : 'bg-blue-800'} text-white p-4`}>
-                <Link to="/">
-                    <div className="flex items-center gap-2 mb-6">
-                        <img src={logo} alt="Logo" className="w-8 h-8 rounded" />
-                        <h2 className="text-2xl font-bold">Dashboard</h2>
-                    </div>
-                </Link>
+                <div className="flex items-center gap-2 mb-6">
+                    <img src={logo} alt="Logo" className="w-8 h-8 rounded" />
+                    <h2 className="text-2xl font-bold">Dashboard</h2>
+                </div>
 
                 <nav className="flex flex-col space-y-2">
                     <NavLink to="/" className={linkStyle}>
@@ -41,8 +39,8 @@ const Dashboard = () => {
                     <button
                         onClick={toggleDarkMode}
                         className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded font-semibold transition duration-200 ${darkMode
-                                ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                                : 'bg-white text-blue-800 hover:bg-gray-100'
+                            ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                            : 'bg-white text-blue-800 hover:bg-gray-100'
                             }`}
                     >
                         {darkMode ? <FaSun /> : <FaMoon />}
