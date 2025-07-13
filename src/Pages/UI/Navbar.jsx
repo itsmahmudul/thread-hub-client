@@ -10,20 +10,28 @@ import {
     FaSun,
 } from "react-icons/fa";
 import useAuth from "../../Hooks/useAuth";
+import useAnnouncements from "../../Hooks/useAnnouncements";
 import logo from "../../assets/logo.png";
 
 const Navbar = () => {
     const { user, logOutUser, darkMode, toggleDarkMode } = useAuth();
+    const announcements = useAnnouncements(); // array of announcements
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const dropdownRef = useRef();
+    const [annDropdownOpen, setAnnDropdownOpen] = useState(false);
 
-    // Close dropdown when clicking outside
+    const dropdownRef = useRef();
+    const annDropdownRef = useRef();
+
+    // Close dropdowns on outside click
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
                 setDropdownOpen(false);
+            }
+            if (annDropdownRef.current && !annDropdownRef.current.contains(e.target)) {
+                setAnnDropdownOpen(false);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -40,7 +48,7 @@ const Navbar = () => {
         }
     };
 
-    // Helper for link styling depending on darkMode & active
+    // NavLink styling helper
     const navLinkClass = ({ isActive }) =>
         `font-medium transition duration-300 ${isActive
             ? darkMode
@@ -79,19 +87,46 @@ const Navbar = () => {
                     Membership
                 </NavLink>
 
-                {/* Notification Button */}
-                <button
-                    className={`relative hover:transition duration-300 ${darkMode ? "text-gray-300 hover:text-blue-400" : "text-gray-700 hover:text-blue-600"
-                        }`}
-                    aria-label="Notifications"
-                >
-                    <FaBell size={20} />
-                    <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full px-1 animate-pingOnce">
-                        3
-                    </span>
-                </button>
+                {/* Announcements Dropdown */}
+                <div className="relative" ref={annDropdownRef}>
+                    <button
+                        className={`relative cursor-pointer hover:transition duration-300 ${darkMode ? "text-gray-300 hover:text-blue-400" : "text-gray-700 hover:text-blue-600"
+                            }`}
+                        aria-label="Announcements"
+                        onClick={() => setAnnDropdownOpen(!annDropdownOpen)}
+                    >
+                        <FaBell size={20} />
+                        {announcements.length > 0 && (
+                            <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs rounded-full px-1 animate-pingOnce">
+                                {announcements.length}
+                            </span>
+                        )}
+                    </button>
 
-                {/* Dark Mode Toggle Button - DESKTOP only */}
+                    {annDropdownOpen && announcements.length > 0 && (
+                        <div
+                            className={`absolute right-0 mt-2 w-80 max-h-72 overflow-y-auto rounded-lg shadow-lg z-50 p-4 ${darkMode
+                                    ? "bg-gray-800 text-white border border-gray-700"
+                                    : "bg-white text-gray-800 border border-gray-200"
+                                }`}
+                        >
+                            <h3 className="text-lg font-semibold mb-2">Announcements</h3>
+                            <ul className="space-y-2 text-sm">
+                                {announcements.map(({ _id, title, message, createdAt }) => (
+                                    <li key={_id} className="border-b pb-2 last:border-none">
+                                        <p className="font-medium">{title}</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">{message}</p>
+                                        <small className="text-xs text-gray-400">
+                                            {new Date(createdAt).toLocaleString()}
+                                        </small>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+
+                {/* Dark Mode Toggle Button */}
                 <button
                     onClick={toggleDarkMode}
                     className={`ml-4 flex items-center transition duration-300 ${darkMode ? "text-gray-300 hover:text-blue-400" : "text-gray-700 hover:text-blue-600"
@@ -102,7 +137,7 @@ const Navbar = () => {
                     {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
                 </button>
 
-                {/* User Section: Join Us or Dropdown */}
+                {/* User Section */}
                 {!user ? (
                     <div className="relative" ref={dropdownRef}>
                         <button
@@ -176,8 +211,7 @@ const Navbar = () => {
                 `}
                             >
                                 <div
-                                    className={`px-4 py-2 border-b ${darkMode ? "border-gray-700" : "border-gray-200"
-                                        } font-semibold`}
+                                    className={`px-4 py-2 border-b ${darkMode ? "border-gray-700" : "border-gray-200"} font-semibold`}
                                 >
                                     {user.displayName || "User"}
                                 </div>
@@ -232,18 +266,34 @@ const Navbar = () => {
                         <span>Dark Mode</span>
                     </button>
 
-                    {/* Notifications */}
+                    {/* Announcements in mobile menu */}
                     <button
-                        className={`flex items-center gap-2 px-6 py-3 font-medium transition ${darkMode ? "hover:bg-gray-700 hover:text-white" : "hover:bg-gray-100 hover:text-gray-700"
+                        onClick={() => setAnnDropdownOpen(!annDropdownOpen)}
+                        className={`flex items-center gap-2 px-6 py-3 font-medium transition cursor-pointer ${darkMode ? "hover:bg-gray-700 hover:text-white" : "hover:bg-gray-100 hover:text-gray-700"
                             }`}
-                        onClick={() => setMobileMenuOpen(false)}
                     >
                         <FaBell size={20} />
-                        <span>Notifications</span>
-                        <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2">
-                            3
-                        </span>
+                        <span>Announcements</span>
+                        {announcements.length > 0 && (
+                            <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2">
+                                {announcements.length}
+                            </span>
+                        )}
                     </button>
+
+                    {annDropdownOpen && announcements.length > 0 && (
+                        <ul className="px-8 py-2 space-y-2 max-h-48 overflow-y-auto text-sm border-t border-gray-300 dark:border-gray-700">
+                            {announcements.map(({ _id, title, message, createdAt }) => (
+                                <li key={_id} className="border-b pb-1 last:border-none">
+                                    <p className="font-medium">{title}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">{message}</p>
+                                    <small className="text-xs text-gray-400">
+                                        {new Date(createdAt).toLocaleString()}
+                                    </small>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
 
                     <NavLink
                         to="/"
