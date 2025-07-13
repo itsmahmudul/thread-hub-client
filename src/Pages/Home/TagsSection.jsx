@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import useAxiosPublic from "../../Hooks/useAxiosSecure";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
 
 const TagsSection = ({ onTagSelect = () => { } }) => {
     const [tags, setTags] = useState([]);

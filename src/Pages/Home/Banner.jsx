@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
-import useAxiosPublic from '../../Hooks/useAxiosSecure';
+import useAxiosPublic from '../../Hooks/useAxiosPublic';
 
 const BannerSearch = () => {
     const axiosPublic = useAxiosPublic();

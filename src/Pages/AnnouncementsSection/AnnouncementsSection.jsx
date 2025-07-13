@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import useAxiosPublic from "../../Hooks/useAxiosSecure";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
 
 const AnnouncementsSection = () => {
   const [announcements, setAnnouncements] = useState([]);
