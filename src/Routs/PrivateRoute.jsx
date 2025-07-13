@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router';
 import useAuth from '../Hooks/useAuth';
 import Lottie from "lottie-react";
-import loadingAnimation from '../assets/lottie/loading.json';
+import loadingAnimation from '../assets/lotties/Loading.json';
 
 const PrivetRouts = ({ children }) => {
     const { user, loading } = useAuth();
