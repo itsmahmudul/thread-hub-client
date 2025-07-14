@@ -5,6 +5,7 @@ import axios from "axios";
 import useAuth from "../Hooks/useAuth";
 import SocialLogin from "./SocialLogin";
 import useAxiosPublic from "../Hooks/useAxiosPublic";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
     const { createUser, updateUserProfile, darkMode } = useAuth();
@@ -71,6 +72,11 @@ const SignUp = () => {
                 email,
                 image: profilePic,
             });
+
+            toast.success("Signup successful! Welcome!", {
+            position: "top-center",
+            autoClose: 2000,
+        });
 
             // 4.done
             reset();
