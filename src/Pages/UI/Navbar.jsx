@@ -8,6 +8,7 @@ import {
     FaUserCircle,
     FaMoon,
     FaSun,
+    FaStar,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import useAuth from "../../Hooks/useAuth";
@@ -16,6 +17,7 @@ import logo from "../../assets/logo.png";
 
 const Navbar = () => {
     const { user, logOutUser, darkMode, toggleDarkMode } = useAuth();
+    console.log(user);
     const announcements = useAnnouncements();
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -30,10 +32,7 @@ const Navbar = () => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
                 setDropdownOpen(false);
             }
-            if (
-                annDropdownRef.current &&
-                !annDropdownRef.current.contains(e.target)
-            ) {
+            if (annDropdownRef.current && !annDropdownRef.current.contains(e.target)) {
                 setAnnDropdownOpen(false);
             }
         };
@@ -71,9 +70,7 @@ const Navbar = () => {
             <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
                 <Link to="/" className="flex items-center gap-2">
                     <img src={logo} alt="ThreadHub Logo" className="h-9 w-9" />
-                    <span className="text-2xl font-extrabold tracking-wide">
-                        ThreadHub
-                    </span>
+                    <span className="text-2xl font-extrabold tracking-wide">ThreadHub</span>
                 </Link>
 
                 {/* Desktop Menu */}
@@ -134,6 +131,7 @@ const Navbar = () => {
                     <button
                         onClick={toggleDarkMode}
                         className="p-2 rounded-md focus:outline-none"
+                        aria-label="Toggle theme"
                     >
                         {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
                     </button>
@@ -185,13 +183,31 @@ const Navbar = () => {
                                     className="flex items-center gap-2"
                                 >
                                     {user.photoURL ? (
-                                        <img
-                                            src={user.photoURL}
-                                            alt="User"
-                                            className="h-9 w-9 rounded-full object-cover border"
-                                        />
+                                        <div className="relative">
+                                            <img
+                                                src={user.photoURL}
+                                                alt="User"
+                                                className="h-9 w-9 rounded-full object-cover border"
+                                            />
+                                            {user.subscription === "gold" && (
+                                                <FaStar
+                                                    className="absolute -top-1 -right-1 text-yellow-400"
+                                                    size={18}
+                                                    title="Gold Subscriber"
+                                                />
+                                            )}
+                                        </div>
                                     ) : (
-                                        <FaUserCircle className="h-8 w-8" />
+                                        <div className="relative">
+                                            <FaUserCircle className="h-8 w-8" />
+                                            {user.subscription === "gold" && (
+                                                <FaStar
+                                                    className="absolute -top-1 -right-1 text-yellow-400"
+                                                    size={18}
+                                                    title="Gold Subscriber"
+                                                />
+                                            )}
+                                        </div>
                                     )}
                                     <FaChevronDown className="text-sm" />
                                 </button>
@@ -236,6 +252,7 @@ const Navbar = () => {
                     <button
                         className="p-2 focus:outline-none"
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        aria-label="Toggle mobile menu"
                     >
                         {mobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                     </button>
@@ -283,6 +300,7 @@ const Navbar = () => {
                             <button
                                 onClick={toggleDarkMode}
                                 className="p-2 rounded-full border hover:scale-105 transition-transform"
+                                aria-label="Toggle theme"
                             >
                                 {darkMode ? <FaSun /> : <FaMoon />}
                             </button>
@@ -296,14 +314,21 @@ const Navbar = () => {
                             {user ? (
                                 <>
                                     <div className="flex items-center justify-between px-2 pb-2 border-b border-gray-400 dark:border-gray-600">
-                                        <div className="font-semibold">
-                                            {user.displayName || "User"}
+                                        <div className="font-semibold">{user.displayName || "User"}</div>
+                                        <div className="relative inline-block">
+                                            <img
+                                                src={user.photoURL}
+                                                alt="User"
+                                                className="h-10 w-10 rounded-full object-cover border"
+                                            />
+                                            {user.subscription === "gold" && (
+                                                <FaStar
+                                                    className="absolute -top-1 -right-1 text-yellow-400"
+                                                    size={20}
+                                                    title="Gold Subscriber"
+                                                />
+                                            )}
                                         </div>
-                                        <img
-                                            src={user.photoURL}
-                                            alt="User"
-                                            className="h-10 w-10 rounded-full object-cover border"
-                                        />
                                     </div>
 
                                     <NavLink

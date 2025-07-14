@@ -34,20 +34,40 @@ const AuthProvider = ({ children }) => {
         return updateProfile(auth.currentUser, profileInfo);
     }
 
-     const logOutUser = () => {
+    const logOutUser = () => {
         setLoading(true);
         return signOut(auth);
     }
 
-    useEffect( () => {
-        const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
+    useEffect(() => {
+        const unSubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                try {
+                    const res = await fetch(`http://localhost:5000/users/${currentUser.email}`);
+                    const mongoUser = await res.json();
+
+                    // Extend the original Firebase user with Mongo fields
+                    const enrichedUser = {
+                        ...currentUser, // ⬅️ Keep Firebase token & methods
+                        subscription: mongoUser.subscription || "free",
+                        authorName: mongoUser.authorName,
+                        authorImage: mongoUser.authorImage,
+                    };
+
+                    setUser(enrichedUser);
+                } catch (err) {
+                    console.error("Failed to load MongoDB user:", err);
+                    setUser(currentUser); // fallback
+                }
+            } else {
+                setUser(null);
+            }
+
             setLoading(false);
-        })
-        return () => {
-            unSubscribe();
-        }
-    } , [])
+        });
+
+        return () => unSubscribe();
+    }, []);
 
     useEffect(() => {
         const className = "dark";
