@@ -4,10 +4,12 @@ import { useNavigate, Link } from "react-router";
 import axios from "axios";
 import useAuth from "../Hooks/useAuth";
 import SocialLogin from "./SocialLogin";
+import useAxiosPublic from "../Hooks/useAxiosPublic";
 
 const SignUp = () => {
     const { createUser, updateUserProfile, darkMode } = useAuth();
     const navigate = useNavigate();
+    const axiosPublic = useAxiosPublic();
 
     const {
         register,
@@ -57,9 +59,20 @@ const SignUp = () => {
                 return;
             }
 
+            // 1.Firebase signUp
             await createUser(email, password);
+
+            // 2.Update Profile
             await updateUserProfile(name, profilePic);
 
+            // 3.Save users to mongodb
+            await axiosPublic.post("/users/signUp", {
+                name,
+                email,
+                image: profilePic,
+            });
+
+            // 4.done
             reset();
             navigate("/");
         } catch (error) {

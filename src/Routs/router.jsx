@@ -9,6 +9,7 @@ import PrivetRouts from "./PrivateRoute";
 import MyProfile from "../Pages/Dashboard/MyProfile/MyProfile";
 import AddPost from "../Pages/Dashboard/AddPost/AddPost";
 import MyPost from "../Pages/Dashboard/MyPost/MyPost";
+import Membership from "../Pages/Membership/Membership";
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +20,12 @@ export const router = createBrowserRouter([
       {
         path: '/',
         Component: Home
+      },
+      {
+        path: '/membership',
+        element: <PrivetRouts>
+          <Membership />
+        </PrivetRouts>
       },
       {
         path: '/login',

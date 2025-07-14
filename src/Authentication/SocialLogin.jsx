@@ -13,20 +13,46 @@ const SocialLogin = () => {
             const result = await googleSignIn();
             const user = result.user;
 
-            toast.success(`Welcome, ${user.displayName || 'User'}!`, {
-                position: 'top-center',
-                autoClose: 2000,
+            // Prepare user data to send to backend
+            const userData = {
+                email: user.email,
+                name: user.displayName,
+                image: user.photoURL,
+                googleId: user.uid, // or user.providerData[0]?.uid
+            };
+
+            // Send user data to your backend
+            const response = await fetch("http://localhost:5000/users/googleSignIn", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(userData),
             });
 
-            navigate('/');
+            const data = await response.json();
+
+            if (response.ok) {
+                toast.success(`Welcome, ${user.displayName || "User"}!`, {
+                    position: "top-center",
+                    autoClose: 2000,
+                });
+
+                // Optionally: save returned user info in context or local storage here
+
+                navigate("/");
+            } else {
+                toast.error(data.message || "Failed to login", {
+                    position: "top-center",
+                });
+            }
         } catch (error) {
             console.error("Google login error:", error);
             toast.error("Google sign-in failed. Please try again.", {
-                position: 'top-center',
+                position: "top-center",
             });
         }
     };
-
     return (
         <div className="mt-6 text-center">
             <button
