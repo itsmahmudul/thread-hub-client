@@ -92,8 +92,8 @@ const SignUp = () => {
     return (
         <div
             className={`min-h-screen flex items-center justify-center px-4 py-12 sm:py-20 ${darkMode
-                    ? "bg-gray-900 bg-gradient-to-br from-gray-800 to-gray-900"
-                    : "bg-gradient-to-br from-blue-50 to-indigo-100"
+                ? "bg-gray-900 bg-gradient-to-br from-gray-800 to-gray-900"
+                : "bg-gradient-to-br from-blue-50 to-indigo-100"
                 }`}
         >
             <div
@@ -178,8 +178,8 @@ const SignUp = () => {
                         <button
                             type="submit"
                             className={`w-full py-3 rounded-lg font-semibold shadow-md hover:scale-[1.02] transition-all duration-300 ${darkMode
-                                    ? "bg-blue-700 text-white hover:bg-blue-800"
-                                    : "bg-blue-600 text-white hover:bg-blue-700"
+                                ? "bg-blue-700 text-white hover:bg-blue-800"
+                                : "bg-blue-600 text-white hover:bg-blue-700"
                                 }`}
                         >
                             Sign Up
@@ -204,8 +204,8 @@ const SignUp = () => {
                 {/* Right Side */}
                 <div
                     className={`w-full sm:w-1/2 p-10 sm:p-16 flex flex-col justify-center items-center animate-fadeInRight ${darkMode
-                            ? "bg-gradient-to-tr from-gray-900 to-gray-800 text-white"
-                            : "bg-gradient-to-tr from-blue-600 to-indigo-700 text-white"
+                        ? "bg-gradient-to-tr from-gray-900 to-gray-800 text-white"
+                        : "bg-gradient-to-tr from-blue-600 to-indigo-700 text-white"
                         }`}
                 >
                     <h3 className="text-2xl font-bold mb-4">Or sign up with</h3>

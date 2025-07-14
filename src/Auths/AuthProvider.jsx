@@ -15,7 +15,7 @@ const AuthProvider = ({ children }) => {
         return saved === "true" || false;
     });
 
-    const cerateUser = (email, password) => {
+    const createUser = (email, password) => {
         setLoading(true);
         return createUserWithEmailAndPassword(auth, email, password)
     }
@@ -66,7 +66,7 @@ const AuthProvider = ({ children }) => {
         darkMode,
         user,
         toggleDarkMode,
-        cerateUser,
+        createUser,
         signInUser,
         googleSignIn,
         logOutUser,
