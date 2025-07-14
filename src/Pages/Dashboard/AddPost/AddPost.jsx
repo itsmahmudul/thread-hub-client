@@ -52,8 +52,8 @@ const AddPost = () => {
             title: data.title,
             description: data.description,
             tags: selectedTags,
-            authorName: user.displayName,
-            authorImage: user.photoURL,
+            authorName: user.displayName || user.authorName,
+            authorImage: user.photoURL || user.authorImage,
             authorEmail: user.email,
             upVote: 0,
             downVote: 0,
@@ -107,11 +107,11 @@ const AddPost = () => {
             className={`max-w-3xl mx-auto p-10 mt-12 backdrop-blur-lg shadow-2xl rounded-2xl 
                 ${darkMode ? 'bg-gray-900/90 text-gray-200' : 'bg-white/90 text-gray-800'}`}
         >
-            {user?.photoURL && (
+            {(user.photoURL || user.authorImage) && (
                 <div className="flex justify-center mb-6">
                     <img
-                        src={user.photoURL}
-                        alt={`${user.displayName || 'Author'}'s avatar`}
+                        src={user.photoURL || user.authorImage}
+                        alt={`${user.displayName || user.authorName || 'Author'}'s avatar`}
                         className={`w-24 h-24 rounded-full object-cover shadow-lg border-4 
                             ${darkMode ? 'border-blue-600' : 'border-blue-400'}`}
                     />
@@ -132,7 +132,7 @@ const AddPost = () => {
                         <input
                             id="authorName"
                             type="text"
-                            value={user?.displayName}
+                            value={user.displayName || user.authorName || ''}
                             readOnly
                             className={`w-full input input-bordered ${darkMode ? 'bg-gray-800 text-gray-200 border-gray-700' : 'bg-gray-100'}`}
                         />
@@ -144,7 +144,7 @@ const AddPost = () => {
                         <input
                             id="authorEmail"
                             type="email"
-                            value={user?.email}
+                            value={user.email || ''}
                             readOnly
                             className={`w-full input input-bordered ${darkMode ? 'bg-gray-800 text-gray-200 border-gray-700' : 'bg-gray-100'}`}
                         />

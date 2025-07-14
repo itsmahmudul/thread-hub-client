@@ -182,10 +182,10 @@ const Navbar = () => {
                                     onClick={() => setDropdownOpen(!dropdownOpen)}
                                     className="flex items-center gap-2"
                                 >
-                                    {user.photoURL ? (
+                                    {user.photoURL || user.authorImage ? (
                                         <div className="relative">
                                             <img
-                                                src={user.photoURL}
+                                                src={user.photoURL || user.authorImage}
                                                 alt="User"
                                                 className="h-9 w-9 rounded-full object-cover border"
                                             />
@@ -227,7 +227,7 @@ const Navbar = () => {
                                                 {user.displayName || "User"}
                                             </div>
                                             <NavLink
-                                                to="/dashboard"
+                                                to="/dashboard/profile"
                                                 onClick={() => setDropdownOpen(false)}
                                                 className="block px-4 py-2 hover:bg-blue-500 hover:text-white"
                                             >
@@ -317,7 +317,7 @@ const Navbar = () => {
                                         <div className="font-semibold">{user.displayName || "User"}</div>
                                         <div className="relative inline-block">
                                             <img
-                                                src={user.photoURL}
+                                                src={user.photoURL || user.authorImage}
                                                 alt="User"
                                                 className="h-10 w-10 rounded-full object-cover border"
                                             />
