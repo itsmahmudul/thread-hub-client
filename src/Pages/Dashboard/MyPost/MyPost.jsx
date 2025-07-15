@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import useAuth from '../../../Hooks/useAuth';
-import { FaComments, FaTrash } from 'react-icons/fa';
+import { FaComments, FaTrash, FaSpinner } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import useAxiosPublic from '../../../Hooks/useAxiosPublic';
 import Swal from 'sweetalert2';
@@ -9,15 +9,27 @@ const MyPosts = () => {
     const { user, darkMode } = useAuth();
     const axiosSecure = useAxiosPublic();
     const [myPosts, setMyPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (user?.email) {
-            axiosSecure.get(`/posts/user?email=${user.email}`)
-                .then(res => {
-                    setMyPosts(res.data);
-                })
-                .catch(() => toast.error('Failed to fetch your posts'));
-        }
+        const fetchPosts = async () => {
+            if (!user?.email) {
+                setLoading(false);
+                return;
+            }
+            try {
+                setLoading(true); 
+                const res = await axiosSecure.get(`/posts/user?email=${user.email}`);
+                setMyPosts(res.data);
+            } catch (error) {
+                console.log(error);
+                toast.error('Failed to fetch your posts');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPosts();
     }, [user, axiosSecure]);
 
     const handleDelete = async (id) => {
@@ -45,8 +57,17 @@ const MyPosts = () => {
         }
     };
 
+    
+    if (loading) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+                <FaSpinner className="animate-spin text-5xl text-white" />
+            </div>
+        );
+    }
+
     return (
-        <div className={`p-4 overflow-x-auto ${darkMode ? 'bg-gray-900 text-gray-200' : 'bg-white text-gray-800'}`}>
+        <div className={`p-4 overflow-x-auto ${darkMode ? 'bg-gray-900 text-gray-200' : 'bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 text-gray-800'}`}>
             <h2 className="text-2xl font-bold mb-4">My Posts</h2>
             <table className={`min-w-full border ${darkMode ? 'border-gray-700' : 'border-gray-300'}`}>
                 <thead>
@@ -59,13 +80,16 @@ const MyPosts = () => {
                 </thead>
                 <tbody>
                     {myPosts.map(post => (
-                        <tr key={post._id} className={`border-t ${darkMode ? 'border-gray-700 hover:bg-gray-800' : 'hover:bg-gray-50'}`}>
+                        <tr
+                            key={post._id}
+                            className={`border-t ${darkMode ? 'border-gray-700 hover:bg-gray-800' : 'hover:bg-gray-50'}`}
+                        >
                             <td className="p-3">{post.title}</td>
                             <td className="p-3">{post.votes || 0}</td>
                             <td className="p-3">
                                 <button
                                     className="text-blue-500 hover:underline flex items-center gap-1"
-                                    onClick={() => window.location.href = `/post/${post._id}`}
+                                    onClick={() => (window.location.href = `/post/${post._id}`)}
                                 >
                                     <FaComments /> Comment
                                 </button>

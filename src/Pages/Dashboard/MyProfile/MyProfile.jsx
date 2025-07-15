@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaStar, FaMedal } from "react-icons/fa";
+import { FaStar, FaMedal, FaSpinner } from "react-icons/fa";
 import { MdOutlinePostAdd } from "react-icons/md";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -36,12 +36,16 @@ const MyProfile = () => {
     const [profile, setProfile] = useState(null);
     const [isGold, setIsGold] = useState(false);
     const [recentPosts, setRecentPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
-            if (!user?.email) return;
-
+            if (!user?.email) {
+                setLoading(false);
+                return;
+            }
             try {
+                setLoading(true);
                 const userRes = await axiosPublic.get(`/users`, {
                     params: { email: user.email },
                 });
@@ -58,11 +62,22 @@ const MyProfile = () => {
                 setRecentPosts(postsRes.data.slice(0, 3));
             } catch (err) {
                 console.error("Error loading profile:", err);
+            } finally {
+                setLoading(false); // ✅ hide loader
             }
         };
 
         fetchData();
     }, [user, axiosPublic]);
+
+    // ✅ loader UI
+    if (loading) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+                <FaSpinner className="animate-spin text-5xl text-white" />
+            </div>
+        );
+    }
 
     if (!profile) {
         return (
@@ -161,7 +176,8 @@ const MyProfile = () => {
                     variants={itemVariants}
                 >
                     <MdOutlinePostAdd
-                        className={`${darkMode ? "text-blue-400" : "text-indigo-600"} text-4xl`}
+                        className={`${darkMode ? "text-blue-400" : "text-indigo-600"
+                            } text-4xl`}
                     />
                     Recent Posts
                 </motion.h3>
@@ -185,7 +201,9 @@ const MyProfile = () => {
                             {recentPosts.map((post) => (
                                 <motion.li
                                     key={post._id}
-                                    className={`rounded-2xl p-6 shadow-md cursor-pointer border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-indigo-200"
+                                    className={`rounded-2xl p-6 shadow-md cursor-pointer border ${darkMode
+                                            ? "bg-gray-800 border-gray-700"
+                                            : "bg-white border-indigo-200"
                                         }`}
                                     variants={itemVariants}
                                     whileHover="hover"
