@@ -40,29 +40,13 @@ const AuthProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        const unSubscribe = onAuthStateChanged(auth, async (currentUser) => {
+        const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
+            console.log(currentUser);
             if (currentUser) {
-                try {
-                    const res = await fetch(`http://localhost:5000/users/${currentUser.email}`);
-                    const mongoUser = await res.json();
-
-                    // Extend the original Firebase user with Mongo fields
-                    const enrichedUser = {
-                        ...currentUser, // ⬅️ Keep Firebase token & methods
-                        subscription: mongoUser.subscription || "free",
-                        authorName: mongoUser.authorName,
-                        authorImage: mongoUser.authorImage,
-                    };
-
-                    setUser(enrichedUser);
-                } catch (err) {
-                    console.error("Failed to load MongoDB user:", err);
-                    setUser(currentUser); // fallback
-                }
+                setUser(currentUser);
             } else {
                 setUser(null);
             }
-
             setLoading(false);
         });
 

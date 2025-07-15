@@ -85,23 +85,23 @@ const MembershipPage = () => {
 
     useEffect(() => {
         const fetchMembershipStatus = async () => {
-            if (user?.email) {
-                try {
-                    const res = await axiosSecure.get(`/users/membership-status?email=${user.email}`);
-                    setIsMember(res.data.isMember);
-                } catch (err) {
-                    console.error("Failed to fetch membership status:", err);
-                    toast.error("Failed to fetch membership status.");
-                } finally {
-                    setLoading(false);
-                }
-            } else {
+            const email = user.email || user.authorEmail;
+            if (!email) return;
+
+            try {
+                const res = await axiosSecure.get(`/users/membership-status?email=${email}`);
+                setIsMember(res.data.isMember);
+            } catch (err) {
+                console.log(err);
+                toast.error("Failed to fetch membership status.");
+            } finally {
                 setLoading(false);
             }
         };
 
         fetchMembershipStatus();
     }, [user, axiosSecure]);
+
 
     const upgradeUser = async () => {
         try {

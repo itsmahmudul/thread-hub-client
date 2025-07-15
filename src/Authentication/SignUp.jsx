@@ -60,13 +60,16 @@ const SignUp = () => {
                 return;
             }
 
-            // 1.Firebase signUp
+            // 1. Firebase sign up
             await createUser(email, password);
 
-            // 2.Update Profile
-            await updateUserProfile(name, profilePic);
+            // ✅ 2. Properly update profile with name and photo
+            await updateUserProfile({
+                displayName: name,
+                photoURL: profilePic
+            });
 
-            // 3.Save users to mongodb
+            // 3. Save user to MongoDB
             await axiosPublic.post("/users/signUp", {
                 name,
                 email,
@@ -74,15 +77,16 @@ const SignUp = () => {
             });
 
             toast.success("Signup successful! Welcome!", {
-            position: "top-center",
-            autoClose: 2000,
-        });
+                position: "top-center",
+                autoClose: 2000,
+            });
 
-            // 4.done
+            // 4. Reset form and navigate
             reset();
             navigate("/");
         } catch (error) {
             console.error("Signup failed:", error);
+            toast.error("Signup failed. Please try again.");
         }
     };
 

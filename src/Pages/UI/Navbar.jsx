@@ -17,7 +17,7 @@ import logo from "../../assets/logo.png";
 
 const Navbar = () => {
     const { user, logOutUser, darkMode, toggleDarkMode } = useAuth();
-    console.log(user);
+    
     const announcements = useAnnouncements();
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
