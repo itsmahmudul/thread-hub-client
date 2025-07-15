@@ -1,5 +1,23 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion"; // ✅ import Framer Motion
 import useAxiosPublic from "../../Hooks/useAxiosPublic";
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1, // delay between children animations
+        },
+    },
+};
+
+const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+    hover: { scale: 1.03, boxShadow: "0px 8px 20px rgba(0,0,0,0.1)" },
+};
 
 const PostsList = () => {
     const axios = useAxiosPublic();
@@ -33,81 +51,120 @@ const PostsList = () => {
     };
 
     return (
-        <div className="space-y-4">
-            {/* Header with Sort Button */}
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">
+        <div className="space-y-6 max-w-7xl mx-auto px-4 py-6">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-extrabold text-gray-900">
                     All Posts
                 </h2>
                 <button
                     onClick={() =>
                         setSortBy(sortBy === "newest" ? "popularity" : "newest")
                     }
-                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                    className="inline-flex items-center px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-700 hover:to-indigo-700 transition"
+                    aria-label="Sort posts"
                 >
                     {sortBy === "newest" ? "Sort by Popularity" : "Sort by Newest"}
                 </button>
             </div>
 
-            {/* Loading & Error States */}
-            {loading && <p className="text-center text-gray-500">Loading posts...</p>}
-            {error && <p className="text-center text-red-500">{error}</p>}
+            {/* Loading & Error */}
+            {loading && (
+                <p className="text-center text-gray-500">Loading posts...</p>
+            )}
+            {error && (
+                <p className="text-center text-red-600 font-medium">{error}</p>
+            )}
 
-            {/* Posts List */}
-            <div className="space-y-4">
+            {/* Posts List with animation */}
+            <motion.div
+                className="space-y-5"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
                 {!loading &&
                     !error &&
                     posts.map((post) => (
-                        <div
+                        <motion.div
                             key={post._id}
-                            className="p-4 rounded-lg border dark:border-gray-700 shadow-sm"
+                            variants={cardVariants}
+                            whileHover="hover"
                         >
-                            <div className="flex items-center space-x-3 mb-2">
-                                <img
-                                    src={post.authorImage || "/default-avatar.png"}
-                                    alt={post.authorName}
-                                    className="w-10 h-10 rounded-full"
-                                />
-                                <h3 className="font-semibold text-lg">{post.title}</h3>
-                            </div>
-                            <div className="text-sm text-gray-600 dark:text-gray-300 flex flex-wrap gap-2 mb-2">
-                                {post.tags?.map((tag) => (
-                                    <span
-                                        key={tag}
-                                        className="px-2 py-1 bg-gray-200 dark:bg-gray-800 rounded"
-                                    >
-                                        #{tag}
+                            <Link
+                                to={`/post/${post._id}`}
+                                className="block p-5 bg-white rounded-xl border border-gray-200 shadow-md transition"
+                            >
+                                <div className="flex items-center gap-4 mb-4">
+                                    <img
+                                        src={post.authorImage || "/default-avatar.png"}
+                                        alt={post.authorName}
+                                        className="w-12 h-12 rounded-full object-cover border-2 border-indigo-500"
+                                    />
+                                    <div>
+                                        <h3 className="text-xl font-semibold text-gray-900">
+                                            {post.title}
+                                        </h3>
+                                        <p className="text-sm text-gray-500">{post.authorName}</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    {post.tags?.map((tag) => (
+                                        <span
+                                            key={tag}
+                                            className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-semibold select-none"
+                                        >
+                                            #{tag}
+                                        </span>
+                                    ))}
+                                </div>
+
+                                <p className="text-sm text-gray-600 mb-4">
+                                    Posted on {new Date(post.createdAt).toLocaleString()}
+                                </p>
+
+                                <div className="flex justify-between items-center text-sm font-medium text-gray-700">
+                                    <span className="flex items-center gap-1">
+                                        💬 {post.upVote ?? 0} comments
                                     </span>
-                                ))}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                                {new Date(post.createdAt).toLocaleString()}
-                            </div>
-                            <div className="mt-2 flex gap-4 text-sm">
-                                <span>💬 {post.upVote ?? 0} comments</span>
-                                <span>👍 {post.upVote ?? 0} | 👎 {post.downVote ?? 0}</span>
-                                <span>⭐ Votes: {(post.upVote || 0) - (post.downVote || 0)}</span>
-                            </div>
-                        </div>
+
+                                    <span className="flex items-center gap-2">
+                                        <span className="flex items-center gap-1 text-green-600">
+                                            👍 {post.upVote ?? 0}
+                                        </span>
+                                        <span className="flex items-center gap-1 text-red-600">
+                                            👎 {post.downVote ?? 0}
+                                        </span>
+                                    </span>
+
+                                    <span className="flex items-center gap-1 text-yellow-500">
+                                        ⭐ {(post.upVote || 0) - (post.downVote || 0)}
+                                    </span>
+                                </div>
+                            </Link>
+                        </motion.div>
                     ))}
-            </div>
+            </motion.div>
 
             {/* Pagination */}
-            <div className="flex justify-center gap-2 mt-4">
+            <div className="flex justify-center gap-4 mt-8">
                 <button
                     disabled={page === 1}
                     onClick={() => setPage((prev) => prev - 1)}
-                    className="px-3 py-1 border rounded disabled:opacity-50"
+                    className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition"
+                    aria-label="Previous page"
                 >
                     Prev
                 </button>
-                <span className="px-3 py-1">
+                <span className="self-center font-medium text-gray-700">
                     Page {page} of {totalPages}
                 </span>
                 <button
                     disabled={page === totalPages}
                     onClick={() => setPage((prev) => prev + 1)}
-                    className="px-3 py-1 border rounded disabled:opacity-50"
+                    className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition"
+                    aria-label="Next page"
                 >
                     Next
                 </button>

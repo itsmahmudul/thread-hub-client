@@ -10,6 +10,7 @@ import MyProfile from "../Pages/Dashboard/MyProfile/MyProfile";
 import AddPost from "../Pages/Dashboard/AddPost/AddPost";
 import MyPost from "../Pages/Dashboard/MyPost/MyPost";
 import Membership from "../Pages/Membership/Membership";
+import PostDetails from "../Pages/Home/PostDetails";
 
 export const router = createBrowserRouter([
   {
@@ -18,30 +19,40 @@ export const router = createBrowserRouter([
     errorElement: <Error></Error>,
     children: [
       {
-        path: '/',
+        path: "/",
         Component: Home
       },
       {
-        path: '/membership',
-        element: <PrivetRouts>
-          <Membership />
-        </PrivetRouts>
+        path: "/membership",
+        element: (
+          <PrivetRouts>
+            <Membership />
+          </PrivetRouts>
+        )
       },
       {
-        path: '/login',
+        path: "/login",
         Component: Login
       },
       {
-        path: '/signUp',
+        path: "/signUp",
         Component: SignUp
+      },
+      {
+        path: "/post/:id",
+        element: <PrivetRouts>
+          <PostDetails />
+        </PrivetRouts>
       }
     ]
   },
   {
     path: "/dashboard",
-    element: <PrivetRouts>
-      <Dashboard></Dashboard>
-    </PrivetRouts>,
+    element: (
+      <PrivetRouts>
+        <Dashboard></Dashboard>
+      </PrivetRouts>
+    ),
     children: [
       {
         path: "profile",
