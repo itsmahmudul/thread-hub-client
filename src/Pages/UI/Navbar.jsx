@@ -14,18 +14,44 @@ import { motion, AnimatePresence } from "framer-motion";
 import useAuth from "../../Hooks/useAuth";
 import useAnnouncements from "../../Hooks/useAnnouncements";
 import logo from "../../assets/logo.png";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+
 
 const Navbar = () => {
     const { user, logOutUser, darkMode, toggleDarkMode } = useAuth();
-    
+    const axiosPublic = useAxiosPublic();
+
     const announcements = useAnnouncements();
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [annDropdownOpen, setAnnDropdownOpen] = useState(false);
 
+    // New state to store subscription fetched from backend
+    const [subscription, setSubscription] = useState(null);
+
     const dropdownRef = useRef();
     const annDropdownRef = useRef();
+
+    // Fetch subscription on user email
+    useEffect(() => {
+        const fetchSubscription = async () => {
+            if (!user?.email) {
+                setSubscription(null);
+                return;
+            }
+            try {
+                const response = await axiosPublic.get("/users", {
+                    params: { email: user.email },
+                });
+                setSubscription(response.data.subscription);
+            } catch (error) {
+                console.error("Failed to fetch subscription:", error);
+                setSubscription(null);
+            }
+        };
+        fetchSubscription();
+    }, [user?.email, axiosPublic]);
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -45,6 +71,7 @@ const Navbar = () => {
             await logOutUser();
             setDropdownOpen(false);
             setMobileMenuOpen(false);
+            setSubscription(null);
         } catch (err) {
             console.error("Logout error:", err);
         }
@@ -63,8 +90,8 @@ const Navbar = () => {
     return (
         <nav
             className={`sticky top-0 z-50 backdrop-blur-lg border-b shadow-md transition-all duration-300 ${darkMode
-                    ? "bg-gray-900/90 border-gray-700 text-gray-200"
-                    : "bg-white/90 border-gray-200 text-gray-800"
+                ? "bg-gray-900/90 border-gray-700 text-gray-200"
+                : "bg-white/90 border-gray-200 text-gray-800"
                 }`}
         >
             <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
@@ -104,8 +131,8 @@ const Navbar = () => {
                                     exit={{ opacity: 0, y: -10 }}
                                     transition={{ duration: 0.2 }}
                                     className={`absolute right-0 mt-2 w-80 max-h-72 overflow-y-auto rounded-lg shadow-lg p-4 z-50 ${darkMode
-                                            ? "bg-gray-800 text-white border border-gray-700"
-                                            : "bg-white text-gray-800 border border-gray-200"
+                                        ? "bg-gray-800 text-white border border-gray-700"
+                                        : "bg-white text-gray-800 border border-gray-200"
                                         }`}
                                 >
                                     <h3 className="text-lg font-semibold mb-2">Announcements</h3>
@@ -113,9 +140,7 @@ const Navbar = () => {
                                         {announcements.map(({ _id, title, message, createdAt }) => (
                                             <li key={_id} className="border-b pb-2 last:border-none">
                                                 <p className="font-medium">{title}</p>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                    {message}
-                                                </p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">{message}</p>
                                                 <small className="text-xs text-gray-400">
                                                     {new Date(createdAt).toLocaleString()}
                                                 </small>
@@ -154,8 +179,8 @@ const Navbar = () => {
                                             exit={{ opacity: 0, y: -10 }}
                                             transition={{ duration: 0.2 }}
                                             className={`absolute right-0 mt-2 w-40 rounded-md shadow-lg z-50 ${darkMode
-                                                    ? "bg-gray-800 border border-gray-700 text-gray-300"
-                                                    : "bg-white border border-gray-200 text-gray-700"
+                                                ? "bg-gray-800 border border-gray-700 text-gray-300"
+                                                : "bg-white border border-gray-200 text-gray-700"
                                                 }`}
                                         >
                                             <NavLink
@@ -182,14 +207,14 @@ const Navbar = () => {
                                     onClick={() => setDropdownOpen(!dropdownOpen)}
                                     className="flex items-center gap-2"
                                 >
-                                    {user.photoURL || user.authorImage ? (
+                                    {user.photoURL ? (
                                         <div className="relative">
                                             <img
-                                                src={user.photoURL || user.authorImage}
+                                                src={user.photoURL}
                                                 alt="User"
                                                 className="h-9 w-9 rounded-full object-cover border"
                                             />
-                                            {user.subscription === "gold" && (
+                                            {subscription === "gold" && (
                                                 <FaStar
                                                     className="absolute -top-1 -right-1 text-yellow-400"
                                                     size={18}
@@ -200,7 +225,7 @@ const Navbar = () => {
                                     ) : (
                                         <div className="relative">
                                             <FaUserCircle className="h-8 w-8" />
-                                            {user.subscription === "gold" && (
+                                            {subscription === "gold" && (
                                                 <FaStar
                                                     className="absolute -top-1 -right-1 text-yellow-400"
                                                     size={18}
@@ -219,8 +244,8 @@ const Navbar = () => {
                                             exit={{ opacity: 0, y: -10 }}
                                             transition={{ duration: 0.2 }}
                                             className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg z-50 ${darkMode
-                                                    ? "bg-gray-800 border border-gray-700 text-gray-300"
-                                                    : "bg-white border border-gray-200 text-gray-700"
+                                                ? "bg-gray-800 border border-gray-700 text-gray-300"
+                                                : "bg-white border border-gray-200 text-gray-700"
                                                 }`}
                                         >
                                             <div className="px-4 py-2 border-b font-semibold">
@@ -321,7 +346,7 @@ const Navbar = () => {
                                                 alt="User"
                                                 className="h-10 w-10 rounded-full object-cover border"
                                             />
-                                            {user.subscription === "gold" && (
+                                            {subscription === "gold" && (
                                                 <FaStar
                                                     className="absolute -top-1 -right-1 text-yellow-400"
                                                     size={20}

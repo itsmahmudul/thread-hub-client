@@ -73,7 +73,7 @@ const SignUp = () => {
             await axiosPublic.post("/users/signUp", {
                 name,
                 email,
-                image: profilePic,
+                image: profilePic
             });
 
             toast.success("Signup successful! Welcome!", {

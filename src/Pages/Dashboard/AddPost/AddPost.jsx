@@ -4,15 +4,17 @@ import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
-import useAxiosSecure from '../../../Hooks/useAxiosPublic';
 import useAuth from '../../../Hooks/useAuth';
+import useAxiosPublic from '../../../Hooks/useAxiosPublic';
+import { FaStar } from 'react-icons/fa';  // Import star icon
 
 const AddPost = () => {
     const { user, darkMode } = useAuth();
-    const axiosSecure = useAxiosSecure();
+    const axiosSecure = useAxiosPublic();
     const [isAllowed, setIsAllowed] = useState(false);
     const [tags, setTags] = useState([]);
     const [submitting, setSubmitting] = useState(false);
+    const [subscription, setSubscription] = useState(null); // <-- New subscription state
     const navigate = useNavigate();
 
     const {
@@ -22,6 +24,24 @@ const AddPost = () => {
         reset,
         formState: { errors },
     } = useForm();
+
+    // Fetch subscription info based on user email
+    useEffect(() => {
+        const fetchSubscription = async () => {
+            if (!user?.email) {
+                setSubscription(null);
+                return;
+            }
+            try {
+                const res = await axiosSecure.get('/users', { params: { email: user.email } });
+                setSubscription(res.data.subscription || null);
+            } catch (error) {
+                console.error('Failed to fetch subscription:', error);
+                setSubscription(null);
+            }
+        };
+        fetchSubscription();
+    }, [user?.email, axiosSecure]);
 
     useEffect(() => {
         const checkPermissions = async () => {
@@ -107,14 +127,23 @@ const AddPost = () => {
             className={`max-w-3xl mx-auto p-10 mt-12 backdrop-blur-lg shadow-2xl rounded-2xl 
                 ${darkMode ? 'bg-gray-900/90 text-gray-200' : 'bg-white/90 text-gray-800'}`}
         >
-            {(user.photoURL || user.authorImage) && (
-                <div className="flex justify-center mb-6">
+            {(user.photoURL) && (
+                <div className="relative w-24 h-24 mx-auto mb-6 flex justify-center items-center">
                     <img
-                        src={user.photoURL || user.authorImage}
-                        alt={`${user.displayName || user.authorName || 'Author'}'s avatar`}
+                        src={user.photoURL}
+                        alt={`${user.displayName || 'Author'}'s avatar`}
                         className={`w-24 h-24 rounded-full object-cover shadow-lg border-4 
-                            ${darkMode ? 'border-blue-600' : 'border-blue-400'}`}
+      ${darkMode ? 'border-blue-600' : 'border-blue-400'}`}
                     />
+                    {/* Gold star inside the picture at top-right corner */}
+                    {subscription === 'gold' && (
+                        <FaStar
+                            size={28}
+                            color="#facc15" // Tailwind yellow-400 color
+                            title="Gold Subscriber"
+                            className="absolute top-1 right-1 rounded-full p-[2px] animate-pulse drop-shadow-md"
+                        />
+                    )}
                 </div>
             )}
 

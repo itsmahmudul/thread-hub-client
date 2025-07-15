@@ -85,7 +85,7 @@ const MembershipPage = () => {
 
     useEffect(() => {
         const fetchMembershipStatus = async () => {
-            const email = user.email || user.authorEmail;
+            const email = user.email;
             if (!email) return;
 
             try {
