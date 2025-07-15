@@ -1,6 +1,8 @@
-import React from 'react';
-import BannerSearch from './Banner';
-import TagsSection from './TagsSection';
+// src/pages/Home.jsx
+import React from "react";
+import BannerSearch from "./Banner";
+import TagsSection from "./TagsSection";
+import PostsList from "./PostsList";
 
 const Home = () => {
     return (
@@ -12,8 +14,15 @@ const Home = () => {
 
             {/* Tags Filter Section */}
             <section>
-                <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Explore by Tags</h2>
+                <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">
+                    Explore by Tags
+                </h2>
                 <TagsSection />
+            </section>
+
+            {/* Posts Section */}
+            <section>
+                <PostsList />
             </section>
         </div>
     );
