@@ -1,5 +1,4 @@
-// src/Pages/Dashboard/Dashboard.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
 import {
@@ -12,11 +11,34 @@ import {
     FaBars,
     FaTimes,
 } from "react-icons/fa";
+import { MdSpaceDashboard } from "react-icons/md";
 import logo from "../../assets/logo.png";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
 
 const Dashboard = () => {
-    const { darkMode, toggleDarkMode } = useAuth();
+    const { darkMode, toggleDarkMode, user } = useAuth();
+    const axiosPublic = useAxiosPublic();
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [userRole, setUserRole] = useState(null);
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            try {
+                const response = await axiosPublic.get("/users", {
+                    params: { email: user?.email },
+                });
+                setUserRole(response.data.role);
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+                setUserRole(null);
+            }
+        };
+
+        if (user?.email) {
+            fetchUserRole();
+        }
+    }, [user?.email, axiosPublic]);
 
     const navLinks = (
         <>
@@ -72,6 +94,22 @@ const Dashboard = () => {
             >
                 <FaThList /> My Posts
             </NavLink>
+
+            {userRole === "admin" && (
+                <NavLink
+                    to="/dashboard/admin/admin-profile"
+                    className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${isActive
+                            ? "bg-indigo-500 text-white shadow-md"
+                            : darkMode
+                                ? "hover:bg-gray-700 hover:text-white"
+                                : "hover:bg-indigo-100 hover:text-indigo-800"
+                        }`
+                    }
+                >
+                    <MdSpaceDashboard /> Admin
+                </NavLink>
+            )}
         </>
     );
 
@@ -149,14 +187,19 @@ const Dashboard = () => {
                 <aside
                     className={`fixed top-0 left-0 h-screen w-64 z-50 flex flex-col justify-between
             backdrop-blur-md shadow-2xl overflow-hidden transition-transform duration-300
-            ${darkMode ? "bg-gray-800/90 text-white" : "bg-white/90 text-indigo-900"}
+            ${darkMode ? "bg-gray-800/90 text-white" : "bg-white/90 text-indigo-900"
+                        }
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           `}
                 >
                     <div>
                         <div className="flex items-center justify-between p-4 border-b border-indigo-200 dark:border-gray-700">
                             <div className="flex items-center gap-2">
-                                <img src={logo} alt="Logo" className="w-10 h-10 rounded-lg shadow-md" />
+                                <img
+                                    src={logo}
+                                    alt="Logo"
+                                    className="w-10 h-10 rounded-lg shadow-md"
+                                />
                                 <h2
                                     className={`text-xl font-bold ${darkMode ? "text-white" : "text-indigo-800"
                                         }`}
@@ -172,7 +215,10 @@ const Dashboard = () => {
                                 <FaTimes />
                             </button>
                         </div>
-                        <nav className="flex flex-col space-y-2 p-4" onClick={() => setSidebarOpen(false)}>
+                        <nav
+                            className="flex flex-col space-y-2 p-4"
+                            onClick={() => setSidebarOpen(false)}
+                        >
                             {navLinks}
                         </nav>
                     </div>
@@ -189,8 +235,6 @@ const Dashboard = () => {
                         </button>
                     </div>
                 </aside>
-
-                {/* ✨ Overlay removed – background stays normal */}
             </div>
         </div>
     );

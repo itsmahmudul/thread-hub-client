@@ -16,7 +16,6 @@ import useAnnouncements from "../../Hooks/useAnnouncements";
 import logo from "../../assets/logo.png";
 import useAxiosPublic from "../../Hooks/useAxiosPublic";
 
-
 const Navbar = () => {
     const { user, logOutUser, darkMode, toggleDarkMode } = useAuth();
     const axiosPublic = useAxiosPublic();
@@ -27,17 +26,19 @@ const Navbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [annDropdownOpen, setAnnDropdownOpen] = useState(false);
 
-    // New state to store subscription fetched from backend
+    // Store subscription & role fetched from backend
     const [subscription, setSubscription] = useState(null);
+    const [userRole, setUserRole] = useState(null);
 
     const dropdownRef = useRef();
     const annDropdownRef = useRef();
 
-    // Fetch subscription on user email
+    // Fetch subscription and role on user email
     useEffect(() => {
-        const fetchSubscription = async () => {
+        const fetchUserData = async () => {
             if (!user?.email) {
                 setSubscription(null);
+                setUserRole(null);
                 return;
             }
             try {
@@ -45,12 +46,14 @@ const Navbar = () => {
                     params: { email: user.email },
                 });
                 setSubscription(response.data.subscription);
+                setUserRole(response.data.role);
             } catch (error) {
-                console.error("Failed to fetch subscription:", error);
+                console.error("Failed to fetch user data:", error);
                 setSubscription(null);
+                setUserRole(null);
             }
         };
-        fetchSubscription();
+        fetchUserData();
     }, [user?.email, axiosPublic]);
 
     useEffect(() => {
@@ -72,6 +75,7 @@ const Navbar = () => {
             setDropdownOpen(false);
             setMobileMenuOpen(false);
             setSubscription(null);
+            setUserRole(null);
         } catch (err) {
             console.error("Logout error:", err);
         }
@@ -90,8 +94,8 @@ const Navbar = () => {
     return (
         <nav
             className={`sticky top-0 z-50 backdrop-blur-lg border-b shadow-md transition-all duration-300 ${darkMode
-                ? "bg-gray-900/90 border-gray-700 text-gray-200"
-                : "bg-white/90 border-gray-200 text-gray-800"
+                    ? "bg-gray-900/90 border-gray-700 text-gray-200"
+                    : "bg-white/90 border-gray-200 text-gray-800"
                 }`}
         >
             <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
@@ -131,8 +135,8 @@ const Navbar = () => {
                                     exit={{ opacity: 0, y: -10 }}
                                     transition={{ duration: 0.2 }}
                                     className={`absolute right-0 mt-2 w-80 max-h-72 overflow-y-auto rounded-lg shadow-lg p-4 z-50 ${darkMode
-                                        ? "bg-gray-800 text-white border border-gray-700"
-                                        : "bg-white text-gray-800 border border-gray-200"
+                                            ? "bg-gray-800 text-white border border-gray-700"
+                                            : "bg-white text-gray-800 border border-gray-200"
                                         }`}
                                 >
                                     <h3 className="text-lg font-semibold mb-2">Announcements</h3>
@@ -179,8 +183,8 @@ const Navbar = () => {
                                             exit={{ opacity: 0, y: -10 }}
                                             transition={{ duration: 0.2 }}
                                             className={`absolute right-0 mt-2 w-40 rounded-md shadow-lg z-50 ${darkMode
-                                                ? "bg-gray-800 border border-gray-700 text-gray-300"
-                                                : "bg-white border border-gray-200 text-gray-700"
+                                                    ? "bg-gray-800 border border-gray-700 text-gray-300"
+                                                    : "bg-white border border-gray-200 text-gray-700"
                                                 }`}
                                         >
                                             <NavLink
@@ -203,10 +207,7 @@ const Navbar = () => {
                             </>
                         ) : (
                             <>
-                                <button
-                                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                                    className="flex items-center gap-2"
-                                >
+                                <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-2">
                                     {user.photoURL ? (
                                         <div className="relative">
                                             <img
@@ -244,15 +245,15 @@ const Navbar = () => {
                                             exit={{ opacity: 0, y: -10 }}
                                             transition={{ duration: 0.2 }}
                                             className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg z-50 ${darkMode
-                                                ? "bg-gray-800 border border-gray-700 text-gray-300"
-                                                : "bg-white border border-gray-200 text-gray-700"
+                                                    ? "bg-gray-800 border border-gray-700 text-gray-300"
+                                                    : "bg-white border border-gray-200 text-gray-700"
                                                 }`}
                                         >
                                             <div className="px-4 py-2 border-b font-semibold">
                                                 {user.displayName || "User"}
                                             </div>
                                             <NavLink
-                                                to="/dashboard/profile"
+                                                to={userRole === "admin" ? "/admin/admin-profile" : "/dashboard/profile"}
                                                 onClick={() => setDropdownOpen(false)}
                                                 className="block px-4 py-2 hover:bg-blue-500 hover:text-white"
                                             >
@@ -300,11 +301,7 @@ const Navbar = () => {
                             className={`rounded-xl px-4 py-3 shadow-sm ${darkMode ? "bg-gray-800" : "bg-gray-100"
                                 }`}
                         >
-                            <NavLink
-                                to="/"
-                                onClick={() => setMobileMenuOpen(false)}
-                                className={navLinkClass}
-                            >
+                            <NavLink to="/" onClick={() => setMobileMenuOpen(false)} className={navLinkClass}>
                                 Home
                             </NavLink>
                             <NavLink
@@ -357,7 +354,7 @@ const Navbar = () => {
                                     </div>
 
                                     <NavLink
-                                        to="/dashboard"
+                                        to={userRole === "admin" ? "/dashboard/admin" : "/dashboard"}
                                         onClick={() => setMobileMenuOpen(false)}
                                         className={navLinkClass}
                                     >

@@ -5,14 +5,17 @@ import Login from "../Authentication/Login";
 import SignUp from "../Authentication/SignUp";
 import Error from "../Pages/Error/error";
 import Dashboard from "../Pages/Dashboard/Dashboard";
+import AdminDashboard from "../Pages/AdminDashboard/AdminDashboard";
+
 import PrivetRouts from "./PrivateRoute";
+import AdminRoute from "./AdminRoute";
+
 import MyProfile from "../Pages/Dashboard/MyProfile/MyProfile";
 import AddPost from "../Pages/Dashboard/AddPost/AddPost";
 import MyPost from "../Pages/Dashboard/MyPost/MyPost";
 import Membership from "../Pages/Membership/Membership";
 import PostDetails from "../Pages/Home/PostDetails";
-import AdminRoute from "./AdminRoute";
-import AdminDashboard from "../Pages/AdminDashboard/AdminDashboard";
+
 import AdminProfile from "../Pages/AdminDashboard/Dash/AdminProfile";
 import ManageUsers from "../Pages/AdminDashboard/Dash/ManageUsers";
 import ReportedActivities from "../Pages/AdminDashboard/Dash/ReportedActivities";
@@ -21,12 +24,12 @@ import MakeAnnouncement from "../Pages/AdminDashboard/Dash/MakeAnnouncement";
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout></MainLayout>,
-    errorElement: <Error></Error>,
+    element: <MainLayout />,
+    errorElement: <Error />,
     children: [
       {
         path: "/",
-        Component: Home
+        element: <Home />
       },
       {
         path: "/membership",
@@ -38,25 +41,29 @@ export const router = createBrowserRouter([
       },
       {
         path: "/login",
-        Component: Login
+        element: <Login />
       },
       {
         path: "/signUp",
-        Component: SignUp
+        element: <SignUp />
       },
       {
         path: "/post/:id",
-        element: <PrivetRouts>
-          <PostDetails />
-        </PrivetRouts>
+        element: (
+          <PrivetRouts>
+            <PostDetails />
+          </PrivetRouts>
+        )
       }
     ]
   },
+
+  // ✅ User Dashboard
   {
     path: "/dashboard",
     element: (
       <PrivetRouts>
-        <Dashboard></Dashboard>
+        <Dashboard />
       </PrivetRouts>
     ),
     children: [
@@ -71,30 +78,34 @@ export const router = createBrowserRouter([
       {
         path: "my-posts",
         element: <MyPost />
+      }
+    ]
+  },
+
+  // ✅ Admin Dashboard
+  {
+    path: "/admin",
+    element: (
+      <AdminRoute>
+        <AdminDashboard />
+      </AdminRoute>
+    ),
+    children: [
+      {
+        path: "admin-profile",
+        element: <AdminProfile />
       },
       {
-        path: "admin",
-        element: <AdminRoute>
-          <AdminDashboard />
-        </AdminRoute>,
-        children: [
-          {
-            index: true,
-            element: <AdminProfile></AdminProfile>
-          },
-          {
-            path: "manage-users",
-            element: <ManageUsers></ManageUsers>
-          },
-          {
-            path: "reported-activities",
-            element: <ReportedActivities></ReportedActivities>
-          },
-          {
-            path: "make-announcement",
-            element: <MakeAnnouncement></MakeAnnouncement>
-          }
-        ]
+        path: "manage-users",
+        element: <ManageUsers />
+      },
+      {
+        path: "reported-activities",
+        element: <ReportedActivities />
+      },
+      {
+        path: "make-announcement",
+        element: <MakeAnnouncement />
       }
     ]
   }

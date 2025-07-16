@@ -1,11 +1,145 @@
-import React from "react";
+import React, { useState } from "react";
+import { NavLink, Outlet } from "react-router-dom";
+import {
+  FaUsers,
+  FaBullhorn,
+  FaFlag,
+  FaUserShield,
+  FaHome,
+  FaMoon,
+  FaSun,
+  FaBars,
+  FaTimes
+} from "react-icons/fa";
+import logo from "../../assets/logo.png";
+import useAuth from "../../Hooks/useAuth";
+import { MdSpaceDashboard } from "react-icons/md";
 
 const AdminDashboard = () => {
+  const { darkMode, toggleDarkMode } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const linkClass = (isActive) =>
+    `flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${isActive
+      ? "bg-indigo-500 text-white shadow-md"
+      : darkMode
+        ? "hover:bg-gray-700 hover:text-white"
+        : "hover:bg-indigo-100 hover:text-indigo-800"
+    }`;
+
+  const adminLinks = (
+    <>
+      <NavLink to="/" className={({ isActive }) => linkClass(isActive)}>
+        <FaHome /> Home
+      </NavLink>
+      <NavLink to="admin-profile" className={({ isActive }) => linkClass(isActive)}>
+        <FaUserShield /> Admin Profile
+      </NavLink>
+      <NavLink to="manage-users" className={({ isActive }) => linkClass(isActive)}>
+        <FaUsers /> Manage Users
+      </NavLink>
+      <NavLink to="reported-activities" className={({ isActive }) => linkClass(isActive)}>
+        <FaFlag /> Reported Activities
+      </NavLink>
+      <NavLink to="make-announcement" className={({ isActive }) => linkClass(isActive)}>
+        <FaBullhorn /> Make Announcement
+      </NavLink>
+      <NavLink to="/dashboard/profile" className={({ isActive }) => linkClass(isActive)}>
+        <MdSpaceDashboard /> Users Dashboard
+      </NavLink>
+    </>
+  );
+
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Admin Dashboard</h1>
-      <p>Welcome, admin! Here you can manage users, posts, settings, and more.</p>
-      {/* Add your admin-specific UI here */}
+    <div
+      className={`min-h-screen ${darkMode
+          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white"
+          : "bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 text-black"
+        }`}
+    >
+      {/* ✅ Desktop Version */}
+      <div className="hidden lg:flex">
+        <aside
+          className={`w-64 h-screen flex flex-col justify-between backdrop-blur-md shadow-2xl rounded-r-3xl overflow-hidden ${darkMode ? "bg-gray-800/90 text-white" : "bg-white/80 text-indigo-900"
+            }`}
+        >
+          <div>
+            <div className="flex items-center gap-2 p-4 border-b border-indigo-200 dark:border-gray-700">
+              <img src={logo} alt="Logo" className="w-10 h-10 rounded-lg shadow-md" />
+              <h2 className="text-xl font-bold">Admin Panel</h2>
+            </div>
+            <nav className="flex flex-col space-y-2 p-4">{adminLinks}</nav>
+          </div>
+          <div className="p-4 border-t border-indigo-200 dark:border-gray-700">
+            <button
+              onClick={toggleDarkMode}
+              className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-semibold shadow-md transition duration-200 ${darkMode
+                  ? "bg-gray-700 hover:bg-gray-600 text-white"
+                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                }`}
+            >
+              {darkMode ? <FaSun /> : <FaMoon />}
+              {darkMode ? "Light Mode" : "Dark Mode"}
+            </button>
+          </div>
+        </aside>
+
+        <main className="flex-1 p-6">
+          <Outlet />
+        </main>
+      </div>
+
+      {/* ✅ Mobile Version */}
+      <div className="lg:hidden flex flex-col min-h-screen">
+        <header
+          className={`flex items-center justify-between p-4 shadow-md ${darkMode ? "bg-gray-800 text-white" : "bg-white/80 backdrop-blur-md text-indigo-900"
+            }`}
+        >
+          <h1 className="text-xl font-bold">Admin Panel</h1>
+          <button onClick={() => setSidebarOpen(true)} className="text-2xl">
+            <FaBars />
+          </button>
+        </header>
+
+        <main className="flex-1 p-6">
+          <Outlet />
+        </main>
+
+        <aside
+          className={`fixed top-0 left-0 h-screen w-64 z-50 flex flex-col justify-between
+            backdrop-blur-md shadow-2xl overflow-hidden transition-transform duration-300
+            ${darkMode ? "bg-gray-800/90 text-white" : "bg-white/90 text-indigo-900"}
+            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          `}
+        >
+          <div>
+            <div className="flex items-center justify-between p-4 border-b border-indigo-200 dark:border-gray-700">
+              <div className="flex items-center gap-2">
+                <img src={logo} alt="Logo" className="w-10 h-10 rounded-lg shadow-md" />
+                <h2 className="text-xl font-bold">Admin Panel</h2>
+              </div>
+              <button onClick={() => setSidebarOpen(false)} className="text-2xl">
+                <FaTimes />
+              </button>
+            </div>
+            <nav className="flex flex-col space-y-2 p-4" onClick={() => setSidebarOpen(false)}>
+              {adminLinks}
+            </nav>
+          </div>
+          <div className="p-4 border-t border-indigo-200 dark:border-gray-700">
+            <button
+              onClick={toggleDarkMode}
+              className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-semibold shadow-md transition duration-200 ${darkMode
+                  ? "bg-gray-700 hover:bg-gray-600 text-white"
+                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                }`}
+            >
+              {darkMode ? <FaSun /> : <FaMoon />}
+              {darkMode ? "Light Mode" : "Dark Mode"}
+            </button>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 };
