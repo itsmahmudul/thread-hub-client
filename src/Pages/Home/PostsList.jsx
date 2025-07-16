@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion"; // ✅ import Framer Motion
 import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import useAuth from "../../Hooks/useAuth";
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -21,6 +22,7 @@ const cardVariants = {
 
 const PostsList = () => {
     const axios = useAxiosPublic();
+    const { darkMode } = useAuth();
 
     const [posts, setPosts] = useState([]);
     const [sortBy, setSortBy] = useState("newest");
@@ -50,18 +52,29 @@ const PostsList = () => {
         }
     };
 
+    // Helper function for conditional classes
+    const textColor = darkMode ? "text-gray-200" : "text-gray-900";
+    const subTextColor = darkMode ? "text-gray-400" : "text-gray-500";
+    const bgColor = darkMode ? "bg-gray-800" : "bg-white";
+    const borderColor = darkMode ? "border-gray-700" : "border-gray-200";
+    const btnBgGradient = darkMode
+        ? "from-indigo-700 to-purple-800 hover:from-indigo-800 hover:to-purple-900"
+        : "from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700";
+    const btnTextColor = "text-white";
+    const btnShadow = "shadow-md";
+
     return (
-        <div className="space-y-6 max-w-7xl mx-auto px-4 py-6">
+        <div className={`space-y-6 max-w-7xl mx-auto px-4 py-6 ${darkMode ? "bg-gray-800" : "bg-white"}`}>
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-extrabold text-gray-900">
+                <h2 className={`text-3xl font-extrabold ${textColor}`}>
                     All Posts
                 </h2>
                 <button
                     onClick={() =>
                         setSortBy(sortBy === "newest" ? "popularity" : "newest")
                     }
-                    className="inline-flex items-center px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-700 hover:to-indigo-700 transition"
+                    className={`inline-flex items-center px-5 py-2 bg-gradient-to-r ${btnBgGradient} ${btnTextColor} font-semibold rounded-lg ${btnShadow} transition`}
                     aria-label="Sort posts"
                 >
                     {sortBy === "newest" ? "Sort by Popularity" : "Sort by Newest"}
@@ -70,7 +83,7 @@ const PostsList = () => {
 
             {/* Loading & Error */}
             {loading && (
-                <p className="text-center text-gray-500">Loading posts...</p>
+                <p className={`text-center ${subTextColor}`}>Loading posts...</p>
             )}
             {error && (
                 <p className="text-center text-red-600 font-medium">{error}</p>
@@ -93,7 +106,7 @@ const PostsList = () => {
                         >
                             <Link
                                 to={`/post/${post._id}`}
-                                className="block p-5 bg-white rounded-xl border border-gray-200 shadow-md transition"
+                                className={`${bgColor} rounded-xl border ${borderColor} shadow-md p-5 block transition`}
                             >
                                 <div className="flex items-center gap-4 mb-4">
                                     <img
@@ -102,10 +115,12 @@ const PostsList = () => {
                                         className="w-12 h-12 rounded-full object-cover border-2 border-indigo-500"
                                     />
                                     <div>
-                                        <h3 className="text-xl font-semibold text-gray-900">
+                                        <h3 className={`text-xl font-semibold ${textColor}`}>
                                             {post.title}
                                         </h3>
-                                        <p className="text-sm text-gray-500">{post.authorName}</p>
+                                        <p className={`${subTextColor} text-sm`}>
+                                            {post.authorName}
+                                        </p>
                                     </div>
                                 </div>
 
@@ -113,32 +128,32 @@ const PostsList = () => {
                                     {post.tags?.map((tag) => (
                                         <span
                                             key={tag}
-                                            className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-semibold select-none"
+                                            className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-semibold select-none dark:bg-indigo-900 dark:text-indigo-300"
                                         >
                                             #{tag}
                                         </span>
                                     ))}
                                 </div>
 
-                                <p className="text-sm text-gray-600 mb-4">
+                                <p className={`${subTextColor} text-sm mb-4`}>
                                     Posted on {new Date(post.createdAt).toLocaleString()}
                                 </p>
 
-                                <div className="flex justify-between items-center text-sm font-medium text-gray-700">
+                                <div className={`flex justify-between items-center text-sm font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                                     <span className="flex items-center gap-1">
                                         💬 {post.upVote ?? 0} comments
                                     </span>
 
                                     <span className="flex items-center gap-2">
-                                        <span className="flex items-center gap-1 text-green-600">
+                                        <span className="flex items-center gap-1 text-green-500">
                                             👍 {post.upVote ?? 0}
                                         </span>
-                                        <span className="flex items-center gap-1 text-red-600">
+                                        <span className="flex items-center gap-1 text-red-500">
                                             👎 {post.downVote ?? 0}
                                         </span>
                                     </span>
 
-                                    <span className="flex items-center gap-1 text-yellow-500">
+                                    <span className="flex items-center gap-1 text-yellow-400">
                                         ⭐ {(post.upVote || 0) - (post.downVote || 0)}
                                     </span>
                                 </div>
@@ -152,18 +167,18 @@ const PostsList = () => {
                 <button
                     disabled={page === 1}
                     onClick={() => setPage((prev) => prev - 1)}
-                    className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition"
+                    className={`px-4 py-2 rounded-md border ${borderColor} ${darkMode ? "bg-gray-700 text-gray-200 hover:bg-gray-600" : "bg-white text-gray-700 hover:bg-gray-100"} disabled:opacity-50 transition`}
                     aria-label="Previous page"
                 >
                     Prev
                 </button>
-                <span className="self-center font-medium text-gray-700">
+                <span className={`self-center font-medium ${textColor}`}>
                     Page {page} of {totalPages}
                 </span>
                 <button
                     disabled={page === totalPages}
                     onClick={() => setPage((prev) => prev + 1)}
-                    className="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition"
+                    className={`px-4 py-2 rounded-md border ${borderColor} ${darkMode ? "bg-gray-700 text-gray-200 hover:bg-gray-600" : "bg-white text-gray-700 hover:bg-gray-100"} disabled:opacity-50 transition`}
                     aria-label="Next page"
                 >
                     Next

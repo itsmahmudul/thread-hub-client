@@ -39,7 +39,7 @@ const TagsSection = ({ onTagSelect = () => { } }) => {
     return (
         <div
             className={`p-5 rounded-2xl shadow-lg border transition-colors duration-300 ${darkMode
-                    ? "bg-gray-900 border-gray-700"
+                    ? "bg-gray-800 border-gray-700"
                     : "bg-white border-gray-100"
                 }`}
         >
