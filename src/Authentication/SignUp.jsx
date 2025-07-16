@@ -63,17 +63,18 @@ const SignUp = () => {
             // 1. Firebase sign up
             await createUser(email, password);
 
-            // ✅ 2. Properly update profile with name and photo
+            // 2. Update Firebase profile
             await updateUserProfile({
                 displayName: name,
-                photoURL: profilePic
+                photoURL: profilePic,
             });
 
-            // 3. Save user to MongoDB
+            // 3. Save user to MongoDB with a role
             await axiosPublic.post("/users/signUp", {
                 name,
                 email,
-                image: profilePic
+                image: profilePic,
+                role: "user",
             });
 
             toast.success("Signup successful! Welcome!", {
@@ -81,7 +82,6 @@ const SignUp = () => {
                 autoClose: 2000,
             });
 
-            // 4. Reset form and navigate
             reset();
             navigate("/");
         } catch (error) {
