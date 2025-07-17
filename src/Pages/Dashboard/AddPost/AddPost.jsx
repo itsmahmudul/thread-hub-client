@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import CreatableSelect from 'react-select/creatable';
+import Select from 'react-select';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
@@ -243,63 +243,67 @@ const AddPost = () => {
                 required: 'Please select at least one tag',
                 validate: value => (value && value.length > 0) || 'Please select at least one tag',
               }}
-              render={({ field }) => {
-                const handleCreate = (inputValue) => {
-                  const newTag = { value: inputValue, label: `#${inputValue}` };
-                  setTags((prev) => [...prev, newTag]);
-                  field.onChange([...(field.value || []), newTag]);
-                };
-
-                return (
-                  <CreatableSelect
-                    {...field}
-                    inputId="tags"
-                    isMulti
-                    options={tags}
-                    onCreateOption={handleCreate}
-                    className="react-select-container"
-                    classNamePrefix="react-select"
-                    placeholder="Select or create tags..."
-                    styles={{
-                      control: (base) => ({
-                        ...base,
-                        minHeight: '44px',
-                        padding: '2px',
-                        backgroundColor: darkMode ? '#1e293b' : undefined,
-                        color: darkMode ? 'white' : undefined,
-                        borderColor: darkMode ? '#2563eb' : '#60a5fa',
-                        boxShadow: darkMode ? '0 0 0 1px #2563eb' : undefined,
-                      }),
-                      input: (base) => ({ ...base, color: darkMode ? 'white' : undefined }),
-                      multiValue: (base) => ({
-                        ...base,
-                        backgroundColor: darkMode ? '#2563eb' : '#e0e7ff',
-                        color: 'white',
-                      }),
-                      multiValueLabel: (base) => ({ ...base, color: 'white' }),
-                      placeholder: (base) => ({ ...base, color: darkMode ? '#cbd5e1' : undefined }),
-                      singleValue: (base) => ({ ...base, color: darkMode ? 'white' : undefined }),
-                      menu: (base) => ({
-                        ...base,
-                        backgroundColor: darkMode ? '#1e293b' : undefined,
-                        color: darkMode ? 'white' : undefined,
-                      }),
-                      option: (base, { isFocused, isSelected }) => ({
-                        ...base,
-                        backgroundColor: isSelected
-                          ? '#2563eb'
-                          : isFocused
-                          ? '#374151'
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  inputId="tags"
+                  isMulti
+                  options={tags}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  placeholder="Select tags..."
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      minHeight: '44px',
+                      padding: '2px',
+                      backgroundColor: darkMode ? '#1e293b' : 'white',
+                      color: darkMode ? 'white' : 'black',
+                      borderColor: darkMode ? '#2563eb' : '#60a5fa',
+                      boxShadow: darkMode ? '0 0 0 1px #2563eb' : undefined,
+                    }),
+                    input: (base) => ({
+                      ...base,
+                      color: darkMode ? 'white' : 'black',
+                    }),
+                    multiValue: (base) => ({
+                      ...base,
+                      backgroundColor: darkMode ? '#2563eb' : '#e0e7ff',
+                      color: darkMode ? 'white' : 'black',
+                    }),
+                    multiValueLabel: (base) => ({
+                      ...base,
+                      color: darkMode ? 'white' : 'black',
+                    }),
+                    placeholder: (base) => ({
+                      ...base,
+                      color: darkMode ? '#cbd5e1' : '#6b7280', // gray-500 for light mode placeholder
+                    }),
+                    singleValue: (base) => ({
+                      ...base,
+                      color: darkMode ? 'white' : 'black',
+                    }),
+                    menu: (base) => ({
+                      ...base,
+                      backgroundColor: darkMode ? '#1e293b' : 'white',
+                      color: darkMode ? 'white' : 'black',
+                    }),
+                    option: (base, { isFocused, isSelected }) => ({
+                      ...base,
+                      backgroundColor: isSelected
+                        ? (darkMode ? '#2563eb' : '#3b82f6') // blue-500 for light mode selected
+                        : isFocused
+                          ? (darkMode ? '#374151' : '#e0e7ff') // gray-700 or blue-200
                           : darkMode
-                          ? '#1e293b'
-                          : undefined,
-                        color: 'white',
-                        cursor: 'pointer',
-                      }),
-                    }}
-                  />
-                );
-              }}
+                            ? '#1e293b'
+                            : 'white',
+                      color: isSelected || isFocused ? 'white' : 'black',
+                      cursor: 'pointer',
+                    }),
+                  }}
+
+                />
+              )}
             />
             {errors.tags && <p className="text-red-500 text-sm mt-1">{errors.tags.message}</p>}
           </div>

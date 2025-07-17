@@ -43,12 +43,13 @@ const AdminProfile = () => {
     }, [axiosSecure]);
 
     const onAddTag = async (data) => {
-        const newTag = data.tag.trim();
+        const newTag = data.tag.trim().toLowerCase(); // convert to lowercase to match backend logic
         if (!newTag) return toast.error("Tag cannot be empty");
         if (tags.includes(newTag)) return toast.error("Tag already exists");
 
         try {
-            const res = await axiosSecure.post("/tags", { tag: newTag });
+            const res = await axiosSecure.post("/tags", { name: newTag });
+
             if (res.data.insertedId) {
                 setTags((prev) => [...prev, newTag]);
                 toast.success(`Tag "${newTag}" added`);
@@ -57,8 +58,12 @@ const AdminProfile = () => {
                 toast.error("Failed to add tag");
             }
         } catch (error) {
-            console.error(error);
-            toast.error("Failed to add tag");
+            if (error.response?.status === 409) {
+                toast.error("Tag already exists");
+            } else {
+                toast.error("Failed to add tag");
+                console.error(error);
+            }
         }
     };
 
