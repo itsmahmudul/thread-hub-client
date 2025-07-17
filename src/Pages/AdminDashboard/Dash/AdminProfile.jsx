@@ -14,6 +14,8 @@ const AdminProfile = () => {
     const axiosSecure = useAxiosPublic();
     const { user, darkMode } = useAuth();
 
+    console.log(user.accessToken);
+
     const [stats, setStats] = useState({ posts: 0, comments: 0, users: 0 });
     const [tags, setTags] = useState([]);
     const { register, handleSubmit, reset } = useForm();
