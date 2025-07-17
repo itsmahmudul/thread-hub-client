@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router';
 import SocialLogin from './SocialLogin';
 
 const Login = () => {
-  const { signInUser } = useAuth();
+  const { signInUser, darkMode } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,13 +24,21 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12 sm:py-20">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
-        <h2 className="text-3xl font-extrabold text-center text-gray-900">Login to ThreadHub</h2>
+    <div className={`min-h-screen flex items-center justify-center px-4 py-12 sm:py-20 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'
+      }`}>
+      <div className={`w-full max-w-md space-y-8 p-8 rounded-2xl shadow-xl border ${darkMode ? 'bg-gray-800 border-gray-700 shadow-black text-gray-200' : 'bg-white border-gray-200 text-gray-900'
+        }`}>
+        <h2 className="text-3xl font-extrabold text-center">
+          Login to ThreadHub
+        </h2>
 
         <form onSubmit={handleLogin} className="mt-6 space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}
+            >
               Email
             </label>
             <input
@@ -38,7 +46,10 @@ const Login = () => {
               name="email"
               type="email"
               required
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              className={`mt-1 block w-full px-4 py-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500 transition ${darkMode
+                  ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-gray-200 focus:ring-blue-400'
+                  : 'bg-white border-gray-300 placeholder-gray-400 text-gray-700 focus:ring-blue-500'
+                }`}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
@@ -46,7 +57,11 @@ const Login = () => {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}
+            >
               Password
             </label>
             <input
@@ -54,7 +69,10 @@ const Login = () => {
               name="password"
               type="password"
               required
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              className={`mt-1 block w-full px-4 py-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500 transition ${darkMode
+                  ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-gray-200 focus:ring-blue-400'
+                  : 'bg-white border-gray-300 placeholder-gray-400 text-gray-700 focus:ring-blue-500'
+                }`}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -71,16 +89,19 @@ const Login = () => {
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className={`w-full border-t ${darkMode ? 'border-gray-600' : 'border-gray-300'
+              }`}></div>
           </div>
-          <div className="relative flex justify-center text-sm text-gray-500 font-medium bg-white px-4">
+          <div className={`relative flex justify-center text-sm font-medium bg-white px-4 ${darkMode ? 'text-gray-400 bg-gray-800' : 'text-gray-500 bg-white'
+            }`}>
             OR
           </div>
         </div>
 
         <SocialLogin />
 
-        <p className="mt-8 text-center text-sm text-gray-600">
+        <p className={`mt-8 text-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'
+          }`}>
           Don’t have an account?{' '}
           <Link
             to="/signUp"
