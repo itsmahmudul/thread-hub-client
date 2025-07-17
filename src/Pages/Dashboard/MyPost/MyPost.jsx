@@ -4,10 +4,12 @@ import { FaComments, FaTrash, FaSpinner } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import useAxiosPublic from '../../../Hooks/useAxiosPublic';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router';
 
 const MyPosts = () => {
     const { user, darkMode } = useAuth();
     const axiosSecure = useAxiosPublic();
+    const navigate = useNavigate();
     const [myPosts, setMyPosts] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -18,7 +20,7 @@ const MyPosts = () => {
                 return;
             }
             try {
-                setLoading(true); 
+                setLoading(true);
                 const res = await axiosSecure.get(`/posts/user?email=${user.email}`);
                 setMyPosts(res.data);
             } catch (error) {
@@ -57,7 +59,7 @@ const MyPosts = () => {
         }
     };
 
-    
+
     if (loading) {
         return (
             <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
@@ -89,7 +91,7 @@ const MyPosts = () => {
                             <td className="p-3">
                                 <button
                                     className="text-blue-500 hover:underline flex items-center gap-1"
-                                    onClick={() => (window.location.href = `/post/${post._id}`)}
+                                    onClick={() => navigate(`/dashboard/comments/${post._id}`)}
                                 >
                                     <FaComments /> Comment
                                 </button>

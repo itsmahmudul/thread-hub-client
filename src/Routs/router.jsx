@@ -20,6 +20,7 @@ import AdminProfile from "../Pages/AdminDashboard/Dash/AdminProfile";
 import ManageUsers from "../Pages/AdminDashboard/Dash/ManageUsers";
 import ReportedActivities from "../Pages/AdminDashboard/Dash/ReportedActivities";
 import MakeAnnouncement from "../Pages/AdminDashboard/Dash/MakeAnnouncement";
+import CommentsPage from "../Pages/Dashboard/MyPost/CommentsPage/CommentsPage";
 
 export const router = createBrowserRouter([
   {
@@ -78,6 +79,10 @@ export const router = createBrowserRouter([
       {
         path: "my-posts",
         element: <MyPost />
+      },
+      {
+        path : "comments/:postId",
+        element: <CommentsPage></CommentsPage>
       }
     ]
   },
