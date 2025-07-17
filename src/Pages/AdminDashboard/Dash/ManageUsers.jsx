@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import useAxiosPublic from "../../../Hooks/useAxiosPublic";
 import useAuth from "../../../Hooks/useAuth";
 
+const USERS_PER_PAGE = 10;
+
 const ManageUsers = () => {
     const axiosPublic = useAxiosPublic();
     const { darkMode } = useAuth();
@@ -10,6 +12,7 @@ const ManageUsers = () => {
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const fetchUsers = async (searchTerm = "") => {
         setLoading(true);
@@ -33,6 +36,7 @@ const ManageUsers = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
+        setCurrentPage(1);
         fetchUsers(search);
     };
 
@@ -50,6 +54,52 @@ const ManageUsers = () => {
             setMessage({ type: "error", text: "Failed to promote user" });
         }
     };
+
+    // Pagination logic
+    const totalPages = Math.ceil(users.length / USERS_PER_PAGE);
+    const paginatedUsers = users.slice(
+        (currentPage - 1) * USERS_PER_PAGE,
+        currentPage * USERS_PER_PAGE
+    );
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const renderPagination = () => (
+        <div className="mt-6 flex justify-center items-center gap-2">
+            <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+                &lt;
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).slice(0, 5).map((page) => (
+                <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-3 py-1 border rounded ${page === currentPage
+                        ? "bg-blue-600 text-white"
+                        : darkMode
+                            ? "bg-gray-800 text-gray-200"
+                            : "bg-white"
+                        }`}
+                >
+                    {page}
+                </button>
+            ))}
+
+            <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+                &gt;
+            </button>
+        </div>
+    );
 
     return (
         <div className={`${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"} p-6 max-w-6xl mx-auto font-sans min-h-screen`}>
@@ -110,7 +160,7 @@ const ManageUsers = () => {
                 >
                     Loading users...
                 </motion.p>
-            ) : users.length === 0 ? (
+            ) : paginatedUsers.length === 0 ? (
                 <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -119,89 +169,94 @@ const ManageUsers = () => {
                     No users found.
                 </motion.p>
             ) : (
-                <div className="space-y-4">
-                    <AnimatePresence>
-                        {users.map((user) => (
-                            <motion.div
-                                key={user._id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                layout
-                                className={`flex flex-col md:flex-row md:items-center justify-between rounded-lg p-4 shadow-md transition hover:shadow-lg
-                  ${darkMode
-                                        ? "bg-gray-800 shadow-gray-700"
-                                        : "bg-white shadow-gray-300"
-                                    }`}
-                            >
-                                <div className="flex items-center space-x-4">
-                                    <img
-                                        src={
-                                            user.authorImage ||
-                                            "https://ui-avatars.com/api/?name=" +
-                                            encodeURIComponent(user.authorName || "User")
-                                        }
-                                        alt={user.authorName}
-                                        className="w-14 h-14 rounded-full object-cover border-2 border-blue-600"
-                                        loading="lazy"
-                                    />
-                                    <div>
-                                        <h3 className={`${darkMode ? "text-gray-100" : "text-gray-800"} text-lg font-semibold`}>
-                                            {user.authorName}
-                                        </h3>
-                                        <p className={`${darkMode ? "text-gray-400" : "text-gray-500"} text-sm`}>
-                                            {user.authorEmail}
-                                        </p>
+                <>
+                    <div className="space-y-4">
+                        <AnimatePresence>
+                            {paginatedUsers.map((user) => (
+                                <motion.div
+                                    key={user._id}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    layout
+                                    className={`flex flex-col md:flex-row md:items-center justify-between rounded-lg p-4 shadow-md transition hover:shadow-lg
+                    ${darkMode
+                                            ? "bg-gray-800 shadow-gray-700"
+                                            : "bg-white shadow-gray-300"
+                                        }`}
+                                >
+                                    <div className="flex items-center space-x-4">
+                                        <img
+                                            src={
+                                                user.authorImage ||
+                                                "https://ui-avatars.com/api/?name=" +
+                                                encodeURIComponent(user.authorName || "User")
+                                            }
+                                            alt={user.authorName}
+                                            className="w-14 h-14 rounded-full object-cover border-2 border-blue-600"
+                                            loading="lazy"
+                                        />
+                                        <div>
+                                            <h3 className={`${darkMode ? "text-gray-100" : "text-gray-800"} text-lg font-semibold`}>
+                                                {user.authorName}
+                                            </h3>
+                                            <p className={`${darkMode ? "text-gray-400" : "text-gray-500"} text-sm`}>
+                                                {user.authorEmail}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="mt-3 md:mt-0 flex flex-wrap gap-3 items-center">
-                                    <span
-                                        className={`px-3 py-1 rounded-full text-xs font-semibold ${user.subscription === "gold"
-                                                ? darkMode
-                                                    ? "bg-yellow-700 text-yellow-200"
-                                                    : "bg-yellow-300 text-yellow-900"
-                                                : darkMode
-                                                    ? "bg-gray-700 text-gray-300"
-                                                    : "bg-gray-200 text-gray-700"
-                                            }`}
-                                    >
-                                        {user.subscription || "free"}
-                                    </span>
-
-                                    <span
-                                        className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${user.role === "admin"
-                                                ? darkMode
-                                                    ? "bg-green-700 text-green-200"
-                                                    : "bg-green-300 text-green-900"
-                                                : darkMode
-                                                    ? "bg-blue-700 text-blue-300"
-                                                    : "bg-blue-200 text-blue-900"
-                                            }`}
-                                    >
-                                        {user.role}
-                                    </span>
-
-                                    {user.role !== "admin" && (
-                                        <button
-                                            onClick={() => makeAdmin(user._id)}
-                                            className="px-4 cursor-pointer py-1 rounded bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition"
-                                            aria-label={`Make ${user.authorName} admin`}
+                                    <div className="mt-3 md:mt-0 flex flex-wrap gap-3 items-center">
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-xs font-semibold ${user.subscription === "gold"
+                                                    ? darkMode
+                                                        ? "bg-yellow-700 text-yellow-200"
+                                                        : "bg-yellow-300 text-yellow-900"
+                                                    : darkMode
+                                                        ? "bg-gray-700 text-gray-300"
+                                                        : "bg-gray-200 text-gray-700"
+                                                }`}
                                         >
-                                            Make Admin
-                                        </button>
-                                    )}
-
-                                    {user.role === "admin" && (
-                                        <span className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-sm font-semibold`}>
-                                            Admin
+                                            {user.subscription || "free"}
                                         </span>
-                                    )}
-                                </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-                </div>
+
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${user.role === "admin"
+                                                    ? darkMode
+                                                        ? "bg-green-700 text-green-200"
+                                                        : "bg-green-300 text-green-900"
+                                                    : darkMode
+                                                        ? "bg-blue-700 text-blue-300"
+                                                        : "bg-blue-200 text-blue-900"
+                                                }`}
+                                        >
+                                            {user.role}
+                                        </span>
+
+                                        {user.role !== "admin" && (
+                                            <button
+                                                onClick={() => makeAdmin(user._id)}
+                                                className="px-4 cursor-pointer py-1 rounded bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition"
+                                                aria-label={`Make ${user.authorName} admin`}
+                                            >
+                                                Make Admin
+                                            </button>
+                                        )}
+
+                                        {user.role === "admin" && (
+                                            <span className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-sm font-semibold`}>
+                                                Admin
+                                            </span>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Pagination footer */}
+                    {totalPages > 1 && renderPagination()}
+                </>
             )}
         </div>
     );

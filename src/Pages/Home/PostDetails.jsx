@@ -64,57 +64,49 @@ const PostDetails = () => {
         }
     };
 
-    const handleUpvote = async () => {
+    // handle Vote
+    const handleVote = async (type) => {
         if (!user) {
             alert("Please login to vote.");
             return;
         }
-        if (post.upVoteUsers?.includes(user.uid)) {
-            alert("You have already upvoted.");
-            return;
-        }
-        if (post.downVoteUsers?.includes(user.uid)) {
-            alert("You have already downvoted. You cannot vote both ways.");
-            return;
-        }
+
         try {
-            await axios.patch(`/posts/${id}/upvote`);
-            setUpVoteCount((prev) => prev + 1);
-            setPost((prev) => ({
-                ...prev,
-                upVote: (prev.upVote || 0) + 1,
-                upVoteUsers: [...(prev.upVoteUsers || []), user.uid],
-            }));
+            await axios.patch(`/posts/vote/${id}`, {
+                voteType: type, // 'upVote' or 'downVote'
+            });
+
+            // Update vote counts locally
+            if (type === "upVote") {
+                setUpVoteCount((prev) => prev + 1);
+                setPost((prev) => ({
+                    ...prev,
+                    upVote: (prev.upVote || 0) + 1,
+                    upVoteUsers: [...(prev.upVoteUsers || []), user.uid],
+                    downVoteUsers: (prev.downVoteUsers || []).filter((u) => u !== user.uid),
+                    downVote: prev.downVoteUsers?.includes(user.uid)
+                        ? (prev.downVote || 1) - 1
+                        : prev.downVote,
+                }));
+            } else {
+                setDownVoteCount((prev) => prev + 1);
+                setPost((prev) => ({
+                    ...prev,
+                    downVote: (prev.downVote || 0) + 1,
+                    downVoteUsers: [...(prev.downVoteUsers || []), user.uid],
+                    upVoteUsers: (prev.upVoteUsers || []).filter((u) => u !== user.uid),
+                    upVote: prev.upVoteUsers?.includes(user.uid)
+                        ? (prev.upVote || 1) - 1
+                        : prev.upVote,
+                }));
+            }
         } catch (err) {
-            console.error("Failed to upvote", err);
+            const msg = err.response?.data?.message || "Failed to vote";
+            alert(msg);
+            console.error("Vote error:", err);
         }
     };
 
-    const handleDownvote = async () => {
-        if (!user) {
-            alert("Please login to vote.");
-            return;
-        }
-        if (post.downVoteUsers?.includes(user.uid)) {
-            alert("You have already downvoted.");
-            return;
-        }
-        if (post.upVoteUsers?.includes(user.uid)) {
-            alert("You have already upvoted. You cannot vote both ways.");
-            return;
-        }
-        try {
-            await axios.patch(`/posts/${id}/downvote`);
-            setDownVoteCount((prev) => prev + 1);
-            setPost((prev) => ({
-                ...prev,
-                downVote: (prev.downVote || 0) + 1,
-                downVoteUsers: [...(prev.downVoteUsers || []), user.uid],
-            }));
-        } catch (err) {
-            console.error("Failed to downvote", err);
-        }
-    };
 
     const handleShare = () => {
         if (navigator.share) {
@@ -186,8 +178,8 @@ const PostDetails = () => {
                     <motion.span
                         key={tag}
                         className={`inline-block px-4 py-1 rounded-full font-semibold cursor-default select-none shadow-sm ${darkMode
-                                ? "bg-indigo-800 text-indigo-300"
-                                : "bg-indigo-100 text-indigo-800"
+                            ? "bg-indigo-800 text-indigo-300"
+                            : "bg-indigo-100 text-indigo-800"
                             }`}
                         whileHover={{
                             scale: 1.1,
@@ -204,27 +196,27 @@ const PostDetails = () => {
             {/* Actions */}
             <div className="flex items-center gap-6 mb-12">
                 <button
-                    onClick={handleUpvote}
+                    onClick={() => handleVote("upVote")}
                     disabled={
                         post.upVoteUsers?.includes(user?.uid) ||
                         post.downVoteUsers?.includes(user?.uid)
                     }
                     className={`flex items-center gap-2 px-5 py-2 rounded-full font-semibold shadow-md transition-transform transform focus:outline-none ${post.upVoteUsers?.includes(user?.uid)
-                            ? "bg-green-300 text-green-900 cursor-not-allowed"
-                            : "bg-green-100 text-green-700 hover:bg-green-200 hover:scale-105"
+                        ? "bg-green-300 text-green-900 cursor-not-allowed"
+                        : "bg-green-100 text-green-700 hover:bg-green-200 hover:scale-105"
                         }`}
                 >
                     👍 <span className="text-lg">{upVoteCount}</span>
                 </button>
                 <button
-                    onClick={handleDownvote}
+                    onClick={() => handleVote("downVote")}
                     disabled={
                         post.downVoteUsers?.includes(user?.uid) ||
                         post.upVoteUsers?.includes(user?.uid)
                     }
                     className={`flex items-center gap-2 px-5 py-2 rounded-full font-semibold shadow-md transition-transform transform focus:outline-none ${post.downVoteUsers?.includes(user?.uid)
-                            ? "bg-red-300 text-red-900 cursor-not-allowed"
-                            : "bg-red-100 text-red-700 hover:bg-red-200 hover:scale-105"
+                        ? "bg-red-300 text-red-900 cursor-not-allowed"
+                        : "bg-red-100 text-red-700 hover:bg-red-200 hover:scale-105"
                         }`}
                 >
                     👎 <span className="text-lg">{downVoteCount}</span>
@@ -255,14 +247,14 @@ const PostDetails = () => {
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             className={`flex-1 border rounded-xl px-5 py-3 focus:outline-none focus:ring-4 placeholder-gray-400 shadow-sm ${darkMode
-                                    ? "bg-gray-800 border-gray-600 focus:ring-indigo-500 text-gray-200"
-                                    : "bg-white border-gray-300 focus:ring-indigo-400 text-gray-700"
+                                ? "bg-gray-800 border-gray-600 focus:ring-indigo-500 text-gray-200"
+                                : "bg-white border-gray-300 focus:ring-indigo-400 text-gray-700"
                                 }`}
                             placeholder="Write a comment..."
                         />
                         <button
                             onClick={handleAddComment}
-                            className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 shadow-lg transition-colors focus:outline-none"
+                            className="px-6 cursor-pointer py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 shadow-lg transition-colors focus:outline-none"
                         >
                             Comment
                         </button>
@@ -278,26 +270,22 @@ const PostDetails = () => {
                     {(showAllComments ? comments : comments.slice(0, 3)).map((c, index) => (
                         <motion.div
                             key={index}
-                            className={`flex items-start gap-4 p-5 rounded-2xl shadow-sm border ${darkMode
-                                    ? "bg-gray-800 border-gray-700"
-                                    : "bg-gray-50 border-gray-200"
+                            className={`flex items-start gap-4 p-5 rounded-2xl shadow-sm border ${darkMode ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200"
                                 }`}
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
                         >
                             <img
-                                src={c.userImage || "/default-avatar.png"}
-                                alt={c.userName}
+                                src={c.authorImage || "/default-avatar.png"}
+                                alt={c.authorName}
                                 className="w-12 h-12 rounded-full object-cover border-2 border-indigo-300"
                             />
                             <div>
                                 <p className={`${darkMode ? "text-indigo-400" : "text-indigo-800"} font-semibold`}>
-                                    {c.userName}
+                                    {c.authorName}
                                 </p>
-                                <p className={`${darkMode ? "text-gray-300" : "text-gray-700"} mt-1`}>
-                                    {c.text}
-                                </p>
+                                <p className={`${darkMode ? "text-gray-300" : "text-gray-700"} mt-1`}>{c.text}</p>
                                 <p className={`${darkMode ? "text-gray-500" : "text-gray-400"} text-xs mt-2`}>
                                     {new Date(c.createdAt).toLocaleString()}
                                 </p>
@@ -305,7 +293,6 @@ const PostDetails = () => {
                         </motion.div>
                     ))}
 
-                    {/* See More Comments Button */}
                     {!showAllComments && comments.length > 3 && (
                         <button
                             onClick={() => setShowAllComments(true)}
@@ -315,6 +302,7 @@ const PostDetails = () => {
                         </button>
                     )}
                 </div>
+
             </section>
         </motion.div>
     );
