@@ -47,8 +47,8 @@ const Login = () => {
               type="email"
               required
               className={`mt-1 block w-full px-4 py-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500 transition ${darkMode
-                  ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-gray-200 focus:ring-blue-400'
-                  : 'bg-white border-gray-300 placeholder-gray-400 text-gray-700 focus:ring-blue-500'
+                ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-gray-200 focus:ring-blue-400'
+                : 'bg-white border-gray-300 placeholder-gray-400 text-gray-700 focus:ring-blue-500'
                 }`}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -70,8 +70,8 @@ const Login = () => {
               type="password"
               required
               className={`mt-1 block w-full px-4 py-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:border-blue-500 transition ${darkMode
-                  ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-gray-200 focus:ring-blue-400'
-                  : 'bg-white border-gray-300 placeholder-gray-400 text-gray-700 focus:ring-blue-500'
+                ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-gray-200 focus:ring-blue-400'
+                : 'bg-white border-gray-300 placeholder-gray-400 text-gray-700 focus:ring-blue-500'
                 }`}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -92,9 +92,14 @@ const Login = () => {
             <div className={`w-full border-t ${darkMode ? 'border-gray-600' : 'border-gray-300'
               }`}></div>
           </div>
-          <div className={`relative flex justify-center text-sm font-medium bg-white px-4 ${darkMode ? 'text-gray-400 bg-gray-800' : 'text-gray-500 bg-white'
-            }`}>
-            OR
+          <div className="relative my-6">
+            <div className={`absolute inset-0 flex items-center`}>
+              <div className={`w-full border-t ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}></div>
+            </div>
+            <span className={`relative px-3 text-sm font-medium ${darkMode ? 'text-gray-400 bg-gray-900' : 'text-gray-500 bg-white'
+              }`}>
+              OR
+            </span>
           </div>
         </div>
 
