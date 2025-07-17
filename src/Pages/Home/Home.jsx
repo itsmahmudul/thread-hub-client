@@ -3,6 +3,7 @@ import React from "react";
 import BannerSearch from "./Banner";
 import TagsSection from "./TagsSection";
 import PostsList from "./PostsList";
+import AnnouncementsSection from "../AnnouncementsSection/AnnouncementsSection";
 
 const Home = () => {
     return (
@@ -18,6 +19,11 @@ const Home = () => {
                     Explore by Tags
                 </h2>
                 <TagsSection />
+            </section>
+
+            {/* ✅ Announcements Section */}
+            <section>
+                <AnnouncementsSection />
             </section>
 
             {/* Posts Section */}

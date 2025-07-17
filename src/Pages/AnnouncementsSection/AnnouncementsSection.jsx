@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import { FaBullhorn } from "react-icons/fa";
+import useAuth from "../../Hooks/useAuth";
 
 const AnnouncementsSection = () => {
   const [announcements, setAnnouncements] = useState([]);
   const axiosPublic = useAxiosPublic();
+  const { darkMode } = useAuth();
 
   useEffect(() => {
     const fetchAnnouncements = async () => {
@@ -23,19 +26,47 @@ const AnnouncementsSection = () => {
     fetchAnnouncements();
   }, [axiosPublic]);
 
-  if (announcements.length === 0) return null; // Hide section if no announcements
+  if (announcements.length === 0) return null;
 
   return (
-    <section className="p-4 bg-yellow-50 rounded-md shadow-md mb-6">
-      <h2 className="text-xl font-bold mb-3">Announcements</h2>
-      <ul className="space-y-2">
-        {announcements.map(({ _id, title, message, createdAt }) => (
-          <li key={_id} className="border-b border-yellow-300 pb-2">
-            <h3 className="font-semibold">{title}</h3>
-            <p>{message}</p>
-            <small className="text-xs text-gray-500">
-              {new Date(createdAt).toLocaleString()}
-            </small>
+    <section
+      className={`p-6 mb-10 rounded-xl shadow-md border ${darkMode
+        ? "bg-gray-900 border-gray-700 text-white"
+        : "bg-white border-gray-200 text-gray-800"
+        }`}
+    >
+      <div className="flex items-center gap-2 mb-6">
+        <FaBullhorn className="text-3xl text-blue-600 dark:text-blue-400" />
+        <h2 className="text-2xl font-bold tracking-tight">Latest Announcements</h2>
+      </div>
+
+      <ul className="space-y-5">
+        {announcements.map(({ _id, title, description, authorName, authorImage, createdAt }) => (
+          <li
+            key={_id}
+            className={`p-5 rounded-lg shadow-sm transition-colors duration-300 border ${darkMode
+              ? "bg-gray-800 border-gray-600"
+              : "bg-gray-50 hover:bg-gray-100 border-gray-300"
+              }`}
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <img
+                src={authorImage}
+                alt={authorName}
+                className="w-10 h-10 rounded-full border-2 border-blue-500 object-cover"
+              />
+              <div>
+                <h3 className="font-semibold text-lg">{title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Posted by <span className="font-medium">{authorName}</span> on{" "}
+                  <span className="italic">{new Date(createdAt).toLocaleString()}</span>
+                </p>
+              </div>
+            </div>
+            <p className={`leading-relaxed ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+              {description}
+            </p>
+
           </li>
         ))}
       </ul>
