@@ -28,7 +28,7 @@ const Footer = () => {
                     <ul className="space-y-2 text-sm">
                         <li><Link to="/" className={`hover:text-sky-600 transition ${darkMode ? 'text-gray-400 hover:text-sky-400' : 'text-gray-600'}`}>Home</Link></li>
                         <li><Link to="/membership" className={`hover:text-orange-500 transition ${darkMode ? 'text-gray-400 hover:text-orange-400' : 'text-gray-600'}`}>Membership</Link></li>
-                        <li><Link to="/login" className={`hover:text-green-600 transition ${darkMode ? 'text-gray-400 hover:text-green-400' : 'text-gray-600'}`}>Join Us</Link></li>
+                        <li><Link to="/terms-and-conditions" className={`hover:text-green-600 transition ${darkMode ? 'text-gray-400 hover:text-green-400' : 'text-gray-600'}`}>Terms And Conditions</Link></li>
                     </ul>
                 </div>
 

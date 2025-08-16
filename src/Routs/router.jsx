@@ -21,6 +21,7 @@ import ManageUsers from "../Pages/AdminDashboard/Dash/ManageUsers";
 import ReportedActivities from "../Pages/AdminDashboard/Dash/ReportedActivities";
 import MakeAnnouncement from "../Pages/AdminDashboard/Dash/MakeAnnouncement";
 import CommentsPage from "../Pages/Dashboard/MyPost/CommentsPage/CommentsPage";
+import TermsAndConditions from "../Pages/TermsAndConditions/TermsAndConditions";
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +56,10 @@ export const router = createBrowserRouter([
             <PostDetails />
           </PrivetRouts>
         )
+      },
+      {
+        path: "/terms-and-conditions",
+        element: <TermsAndConditions />
       }
     ]
   },
